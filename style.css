@@ -65,12 +65,36 @@ body {
 	}
 }
 
+@media (max-height: 500px) and (orientation:landscape) {
+	body {
+		height: calc(100vh - 8em);
+	}
+
+	.image-container img {
+		max-height: 200px;
+	}
+}
+
 @media (max-width: 1000px) and (orientation:portrait) {
+	body {
+		height: calc(100vh - 15em);
+	}
+
 	.link-body h2 {
 		font-size: 5em;
 	}
 
 	.link-body h3 {
 		font-size: 3em;
+	}
+}
+
+@media (max-width: 600px) and (orientation:portrait) {
+	.link-body h2 {
+		font-size: 4em;
+	}
+
+	.link-body h3 {
+		font-size: 2em;
 	}
 }
