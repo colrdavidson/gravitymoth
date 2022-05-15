@@ -67,7 +67,7 @@ body {
 
 @media (max-height: 500px) and (orientation:landscape) {
 	body {
-		height: calc(100vh - 8em);
+		height: calc(100vh - 10em);
 	}
 
 	.image-container img {
