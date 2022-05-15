@@ -1,4 +1,13 @@
 :root {
+	--bg-color: #FFF;
+	--font-color: #0083B7;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-color: #181A1B;
+		--font-color: #4CCCFF;
+	}
 }
 
 h1, h2, h3, h4, h5 {
@@ -14,6 +23,9 @@ body {
 	margin-right: auto;
 	max-width: 70em;
 	height: calc(100vh - 2em);
+
+	background-color: var(--bg-color);
+	color: var(--font-color);
 }
 
 .centered-container {
@@ -42,7 +54,6 @@ body {
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-start;
-	color: #0083B7;
 	font-family: 'Oxanium';
 
 }
