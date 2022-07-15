@@ -1,3 +1,4 @@
+rm -rf public
 mkdir public
 
 # Setup top-level
