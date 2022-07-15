@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"io"
 	"time"
 	"strings"
 	"sort"
@@ -58,7 +57,6 @@ func main() {
 	}
 
 	var template_file fs.FileInfo = nil
-	var style_file fs.FileInfo = nil
 	mds := make([]BlogEntry, 0)
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".blg") {
@@ -104,8 +102,6 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 			mds = append(mds, md)
 		} else if strings.HasSuffix(file.Name(), ".html") {
 			template_file = file
-		} else if strings.HasSuffix(file.Name(), ".css") {
-			style_file = file
 		}
 	}
 
@@ -115,18 +111,6 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 
 	_ = os.RemoveAll(bin_dir)
 	_ = os.Mkdir(bin_dir, os.ModePerm)
-
-	style_in_path := fmt.Sprintf("%s%s", static_dir, style_file.Name())
-	style_out_path := fmt.Sprintf("%s%s", bin_dir, style_file.Name())
-	style_in, err := os.Open(style_in_path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	style_out, err := os.Create(style_out_path)
-	_, err = io.Copy(style_out, style_in)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	templpath := fmt.Sprintf("%s%s", static_dir, template_file.Name())
 	template, err := os.ReadFile(templpath)

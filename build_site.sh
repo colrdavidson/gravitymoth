@@ -4,6 +4,7 @@ mkdir public
 # Setup top-level
 cp CNAME public/.
 cp index.html public/.
+cp index.js public/.
 cp style.css public/.
 cp -r media public/.
 
