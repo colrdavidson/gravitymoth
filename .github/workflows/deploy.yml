@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build site
-        run: cd ./blog && ./build.sh && ./gen_site
+        run: ./build_site.sh
 
       - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
