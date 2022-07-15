@@ -1,0 +1,28 @@
+title: DWARF Section Breakdown
+date: 02-18-2022 11:00 PST
+slug: dwarfsections
+
+I've spend the last month or two fiddling with my own custom debugger, learning to parse DWARF.
+DWARF is a very flexible format, made to support a wide variety of languages out of the box, but it pays for that
+flexibility with complexity. Dealing with DWARF is a pain.
+
+DWARF usually contains 6 sections:
+ 
+- `.debug_line`
+- `.debug_frame`
+- `.debug_info`
+- `.debug_abbrev`
+- `.debug_loc`
+- `.debug_str` 
+
+all of which you need in some way to be able to provide full-featured debugging support.
+
+### Section Content
+`.debug_line` contains an executable bytecode which generates the map between lines in files and memory addresses that
+you can use to set breakpoints
+
+`.debug_frame`, together with `.eh_frame` contain executable bytecode you can run to help unwind the stack, used for building a stack trace
+
+`.debug_abbrev`, `.debug_info`, `.debug_loc`, and `.debug_str` together, 
+provide enough information to rebuild a loose AST-like representation of the code, 
+so you can read variables in a live program, resolve type information, and determine where a function's stack frame setup and teardown begins and ends.
