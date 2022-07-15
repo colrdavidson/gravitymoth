@@ -4,22 +4,43 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
 		<meta name="theme-color" content="#0083B7">
+
 		<link rel="stylesheet" href="style.css">
 		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<script src="index.js"></script>
+
 		<title>Gravity Moth</title>
 	</head>
 	<body>
-		<div class="centered-container">
-			<div class="image-container">
-				<img src="/media/logo.svg" />
-			</div>
-			<div class="link-body">
-				<h2>Gravity Moth</h2>
-				<h3>Coming Soon</h3>
-			</div>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<button class="nav-link menu" onClick="toggleMenu();">
+					<i class="fa fa-bars" aria-hidden="true"></i>
+				</button>
+				<a class="nav-link entry"     href="/blog">Blog</a>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="banner">
+			<section id="content-header">
+				<img src="/media/logo.svg"></img>
+				<h1 class="announce">Gravity Moth is Here</h1>
+			</section>
+		</div>
+		<div class="root main">
+			<section id="content">
+				<h1>We've got some neat stuff on the way!</h1>
+				<p>Stay tuned, I should have some fun screenshots, demos, and things to read soon</p>
+			</section>
+			<section id="nav-footer"></section>
 		</div>
 	</body>
 </html>
