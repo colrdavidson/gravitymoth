@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<link rel="stylesheet" href="../style.css" />
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<button class="nav-link menu" onClick="toggleMenu();">
+					<i class="fa fa-bars" aria-hidden="true"></i>
+				</button>
+				<a class="nav-link entry"     href="/blog">Blog</a>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="content"><h1>Inspecting Data With Your Eyes</h1><h5>Fri, 15 Jul 2022</h5><p>I run programs all day every day. Programs are a computer user&rsquo;s bread and butter.
+I <em>rarely</em> stop to really take a look at them though. What does a program actually look like?
+x86 bytecode has a pretty consistent look, if you stick it under the microscope with a tool like <code>xxd</code>.
+What if you wanted to see a <em>lot</em> of the data all at once? There&rsquo;s actually a really convienient format for ingesting
+bulk data quickly.. Images! Our brain/eyes handle wide, parallel ingest pretty well, and we do a pretty great job at
+visual pattern recognition. Similarly, you can also apply sensor motion data to a rectangular prism model to quickly
+sniff-test motion vectors, but we&rsquo;ll get into that one another day.</p>
+
+<p>There&rsquo;s a super simple image format out there, NetBPM, that makes converting any random data into a visualization, trivial.</p>
+
+<p>There&rsquo;s 6 variants, each of which can be handy.</p>
+
+<table>
+<thead>
+<tr>
+<th>Magic Number</th>
+<th>Meaning</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>P1</td>
+<td>ascii black and white</td>
+</tr>
+
+<tr>
+<td>P2</td>
+<td>ascii greyscale</td>
+</tr>
+
+<tr>
+<td>P3</td>
+<td>ascii color</td>
+</tr>
+
+<tr>
+<td>P4</td>
+<td>binary black and white</td>
+</tr>
+
+<tr>
+<td>P5</td>
+<td>binary greyscale</td>
+</tr>
+
+<tr>
+<td>P6</td>
+<td>binary color</td>
+</tr>
+</tbody>
+</table>
+<p>The format, roughly</p>
+
+<pre><code>&lt;PNM Magic&gt;
+&lt;width&gt; &lt;height&gt;
+&lt;color depth&gt;
+...binary/text data...
+</code></pre>
+
+<p>So, an simple ascii PNM image</p>
+
+<pre><code>P1
+4 4
+
+1 0 1 0
+0 1 0 1
+1 0 1 0
+0 1 0 1
+</code></pre>
+
+<p>Once you fill out the ascii NetBPM header, you can plop the rest of the binary immediately after it, fire up your new
+file in your favorite image viewer that supports the pnm format, and then enjoy!</p>
+
+<p>Some interesting dumps I took of little things I&rsquo;ve worked on in C, Odin, and Go</p>
+
+<p><img src="../media/loader.png" alt="Loader" />
+<img src="../media/swizzle.png" alt="Swizzle" />
+<img src="../media/simple_elf.png" alt="Empty Odin File" />
+<img src="../media/go.png" alt="Go Bot" /></p>
+
+<p>I love staring at this stuff, it makes some fascinating patterns. If you shuffle around how you compute dimensions
+for the data, you can encourage new patterns to pop out, as various parts of the binary line up.  What&rsquo;s the stride
+length of your ELF section headers? Try making a render with a width that&rsquo;s a multiple of a section header in bytes,
+see if it pops out!</p>
+</section>
+			<section id="sidebar">
+				<ul><li><a href="/blog/dataviz.html">Inspecting Data With Your Eyes</a></li><li><a href="/blog/dnsdecode.html">DNS Domain Name Decoding</a></li><li><a href="/blog/dwarfsections.html">DWARF Section Breakdown</a></li><li><a href="/blog/firstentry.html">Starting a Blog</a></li></ul>
+			</section>
+			<section id="nav-footer"><a class="older-link" href="/blog/dnsdecode.html">Older</a></section>
+		</div>
+	</body>
+</html>
