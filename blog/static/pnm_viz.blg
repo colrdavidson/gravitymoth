@@ -31,7 +31,7 @@ The format, roughly
 ...binary/text data...
 ```
 
-So, an simple ascii PNM image
+So, an simple black and white ascii PNM image
 ```
 P1
 4 4
