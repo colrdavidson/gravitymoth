@@ -19,11 +19,11 @@
 	<body>
 		<nav>
 			<span class="nav-frame">
-				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<a class="nav-link top" href="/">Gravity Moth</a>
 				<button class="nav-link menu" onClick="toggleMenu();">
 					<i class="fa fa-bars" aria-hidden="true"></i>
 				</button>
-				<a class="nav-link entry"     href="/blog">Blog</a>
+				<a class="nav-link entry" href="/blog">Blog</a>
 			</span>
 		</nav>
 		<div id="dropdown-menu">
@@ -31,14 +31,48 @@
 		</div>
 		<div class="banner">
 			<section id="content-header">
-				<img src="/media/logo.svg"></img>
-				<h1 class="announce">Gravity Moth is Here</h1>
+				<img src="/media/logo.svg" />
+				<h1 class="announce">Gravity Moth is Coming Soon!</h1>
 			</section>
 		</div>
 		<div class="root main">
 			<section id="content">
-				<h1>We've got some neat stuff on the way!</h1>
-				<p>Stay tuned, I should have some fun screenshots, demos, and things to read soon</p>
+				<h2>We're working on bringing you some awesome stuff!</h2>
+				<p>Gravity Moth is working on bringing powerful new debugging tools to Linux!</p>
+				<p>We're not ready for a launch quite yet, there's still quite a lot left to do. I'm tired of fighting with 
+				my tools, this stuff is as much for my sake as it is for all of you. The better the tools get, the faster 
+				the process of iterating on them should go, so I'm hopeful we'll have some fun stuff available soon.</p>
+				<h2>Sneak Peek</h2>
+				<div class="content-highlight">
+					<h3>Debugging Should Be Legible</h3>
+					<div class="side-by-side">
+						<p>Why don't we have syntax highlighting for assembly? We use syntax highlighting in many higher-level languages
+						daily, to make it easier to quickly scan and follow code flow. It's time to bring disassemblers up to speed
+						with modern, 80s technology.</p>
+						<img src="media/asm.png" />
+					</div>
+				</div>
+				<div class="content-highlight">
+					<h3>History Matters</h3>
+					<div class="side-by-side">
+						<img src="media/history.png" />
+						<p>When dissecting real catastrophes, inspectors build out a timeline and attempt to retrace footsteps.
+						Debugging code should work the same way. We track the how your program changes registers and memory
+						as it runs, save all your syscalls, and allow you to replay your code exactly the way it failed, 
+						so you can reliably walk backwards from the problem to find the cause.</p>
+					</div>
+				</div>
+				<div class="content-highlight">
+					<h3>Data Has A Shape</h3>
+					<div class="side-by-side">
+						<p>Real data has striations, character, and personality. Really understanding a problem might require a
+						new way of looking at your code or your dataset. We try to provide the tools to visualize your problem
+						in a handful of new, unique ways, to help you build strong intuition about your problems. This is a real
+						ELF binary, with large static tables of content that shouldn't be there, plainly visible when displayed 
+						as a greyscale image.</p>
+						<img src="media/striations.png" />
+					</div>
+				</div>
 			</section>
 			<section id="nav-footer"></section>
 		</div>
