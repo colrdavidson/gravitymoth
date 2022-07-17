@@ -224,6 +224,10 @@ nav {
 		flex-direction: column;
 	}
 
+	.side-by-side > img {
+		max-width: calc(100vw - 4em);
+	}
+
 	.side-by-side > p {
 		font-size: 1em;
 	}
