@@ -115,6 +115,10 @@ file in your favorite image viewer that supports the pnm format, and then enjoy!
 for the data, you can encourage new patterns to pop out, as various parts of the binary line up.  What&rsquo;s the stride
 length of your ELF section headers? Try making a render with a width that&rsquo;s a multiple of a section header in bytes,
 see if it pops out!</p>
+
+<p>Another interesting observation, taking a look at the <em>big</em> image, you&rsquo;ll notice one section looks particularly like noise.
+It&rsquo;s actually compressed! Go compresses debug information by default. Sections with code look streaky, and string tables are
+fairly similarly toned, with black null terminator holes at the ends.</p>
 </section>
 			<section id="sidebar">
 				<ul><li><a href="/blog/dataviz.html">Inspecting Data With Your Eyes</a></li><li><a href="/blog/dnsdecode.html">DNS Domain Name Decoding</a></li><li><a href="/blog/dwarfsections.html">DWARF Section Breakdown</a></li><li><a href="/blog/firstentry.html">Starting a Blog</a></li></ul>
