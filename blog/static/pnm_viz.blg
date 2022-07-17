@@ -56,3 +56,7 @@ I love staring at this stuff, it makes some fascinating patterns. If you shuffle
 for the data, you can encourage new patterns to pop out, as various parts of the binary line up.  What's the stride
 length of your ELF section headers? Try making a render with a width that's a multiple of a section header in bytes,
 see if it pops out!
+
+Another interesting observation, taking a look at the *big* image, you'll notice one section looks particularly like noise.
+It's actually compressed! Go compresses debug information by default. Sections with code look streaky, and string tables are 
+fairly similarly toned, with black null terminator holes at the ends.
