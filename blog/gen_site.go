@@ -51,13 +51,122 @@ func generate_link_row(entries []BlogEntry, idx int, f *os.File) {
 	}
 }
 
+func generate_posts(entries []BlogEntry, html_template string) {
+	file_chunks := strings.Split(html_template, "{{header}}")
+	if len(file_chunks) != 2 {
+		log.Fatal("Template had no {{header}} tag!\n")
+	}
+
+	body_chunks := strings.Split(file_chunks[1], "{{content}}")
+	if len(body_chunks) != 2 {
+		log.Fatal("Template had no {{content}} tag!\n")
+	}
+
+	slug_chunks := strings.Split(body_chunks[1], "{{slugs}}")
+	if len(slug_chunks) != 2 {
+		log.Fatal("Template had no {{slugs}} tag!\n")
+	}
+
+	nav_foot_chunks := strings.Split(slug_chunks[1], "{{nav-foot}}")
+	if len(nav_foot_chunks) != 2 {
+		log.Fatal("Template had no {{nav-foot}} tag!\n")
+	}
+
+	chunks := []string{file_chunks[0], body_chunks[0], slug_chunks[0], nav_foot_chunks[0], nav_foot_chunks[1]}
+	slugs := make([]string, 0)
+	for _, md := range entries {
+		slug_link := fmt.Sprintf("%s.html", md.Slug)
+		li_str := fmt.Sprintf("<a class=\"slug-entry\" href=\"%s\"><li><p>%s</p></li></a>", slug_link, md.Title)
+		slugs = append(slugs, li_str)
+	}
+
+	for i, entry := range entries {
+		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
+		if i == 0 {
+			slug_link := fmt.Sprintf("%s.html", entry.Slug)
+			headname := fmt.Sprintf("%sindex.html", bin_dir)
+			generate_redirect(headname, slug_link)
+		}
+
+		f, err := os.Create(bin_name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		f.WriteString(chunks[0])
+
+		date_str := entry.Date.Format(out_time_fmt)
+		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
+		f.WriteString(hdr_str)
+
+		f.WriteString("<div class=\"link-row\">")
+		generate_link_row(entries, i, f)
+		f.WriteString("</div>")
+
+		f.WriteString(chunks[1])
+
+		html := markdown.ToHTML(entry.Content, nil, nil)
+		f.WriteString(string(html))
+		f.WriteString(chunks[2])
+
+		for j, s := range slugs {
+			if j == i {
+				li_str := fmt.Sprintf("<a class=\"slug-entry selected\"><li><p>%s</p></li></a>", entry.Title)
+
+				f.WriteString(li_str)
+			} else {
+				f.WriteString(s)
+			}
+		}
+		f.WriteString(chunks[3])
+
+		generate_link_row(entries, i, f)
+
+		f.WriteString(chunks[4])
+	}
+}
+
+func generate_rss(entries []BlogEntry, rss_template string) {
+	file_chunks := strings.Split(rss_template, "{{entries}}")
+	if len(file_chunks) != 2 {
+		log.Fatal("Template had no {{entries}} tag!\n")
+	}
+	chunks := []string{file_chunks[0], file_chunks[1]}
+
+	bin_name := fmt.Sprintf("%sfeed.xml", bin_dir)
+	f, err := os.Create(bin_name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	f.WriteString(chunks[0])
+
+	for i, entry := range entries {
+		date_str := entry.Date.Format(time.RFC3339)	
+		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
+		author_str := "cloin"
+		post_str := fmt.Sprintf("<item>\n\t\t<title>%s</title>\n\t\t<link rel=\"alternate\" href=\"%s\" />\n\t\t<author>\n\t\t\t<name>%s</name>\n\t\t</author>\n\t\t<published>%s</published>\n\t</item>", entry.Title, post_link, author_str, date_str)
+
+		if i != 0 {
+			f.WriteString("\n\t")
+		}
+
+		f.WriteString(post_str)
+	}
+
+	f.WriteString(chunks[1])
+}
+
 func main() {
 	files, err := ioutil.ReadDir(static_dir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var template_file fs.FileInfo = nil
+	var html_template_file fs.FileInfo = nil
+	var rss_template_file fs.FileInfo = nil
 	mds := make([]BlogEntry, 0)
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".blg") {
@@ -101,102 +210,41 @@ func main() {
 			md := BlogEntry{Name: file.Name(), Path: static_dir, Content:
 content, Title: string(title), Date: date, Slug: string(slug)}
 			mds = append(mds, md)
-		} else if strings.HasSuffix(file.Name(), ".html") {
-			template_file = file
+		} else if file.Name() == "template.html" {
+			html_template_file = file
+		} else if file.Name() == "rss_template.xml" {
+			rss_template_file = file
 		}
 	}
 
-	if template_file == nil {
-		log.Fatal("Couln't find template host!\n")
+	if html_template_file == nil {
+		log.Fatal("Couln't find html template!\n")
+	}
+	if rss_template_file == nil {
+		log.Fatal("Couln't find rss template!\n")
 	}
 
 	_ = os.RemoveAll(bin_dir)
 	_ = os.Mkdir(bin_dir, os.ModePerm)
 
-	templpath := fmt.Sprintf("%s%s", static_dir, template_file.Name())
-	template, err := os.ReadFile(templpath)
+	html_templpath := fmt.Sprintf("%s%s", static_dir, html_template_file.Name())
+	html_template, err := os.ReadFile(html_templpath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file_chunks := strings.Split(string(template), "{{header}}")
-	if len(file_chunks) != 2 {
-		log.Fatal("Template had no {{header}} tag!\n")
+	rss_templpath := fmt.Sprintf("%s%s", static_dir, rss_template_file.Name())
+	rss_template, err := os.ReadFile(rss_templpath)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	body_chunks := strings.Split(file_chunks[1], "{{content}}")
-	if len(body_chunks) != 2 {
-		log.Fatal("Template had no {{content}} tag!\n")
-	}
-
-	slug_chunks := strings.Split(body_chunks[1], "{{slugs}}")
-	if len(slug_chunks) != 2 {
-		log.Fatal("Template had no {{slugs}} tag!\n")
-	}
-
-	nav_foot_chunks := strings.Split(slug_chunks[1], "{{nav-foot}}")
-	if len(nav_foot_chunks) != 2 {
-		log.Fatal("Template had no {{nav-foot}} tag!\n")
-	}
-
-	chunks := []string{file_chunks[0], body_chunks[0], slug_chunks[0], nav_foot_chunks[0], nav_foot_chunks[1]}
 
 	sort.SliceStable(mds, func(i, j int) bool {
 		return mds[i].Date.After(mds[j].Date)
 	})
 
-	slugs := make([]string, 0)
-	for _, md := range mds {
-		slug_link := fmt.Sprintf("%s.html", md.Slug)
-		li_str := fmt.Sprintf("<a class=\"slug-entry\" href=\"%s\"><li><p>%s</p></li></a>", slug_link, md.Title)
-		slugs = append(slugs, li_str)
-	}
-
-	headname := fmt.Sprintf("%sindex.html", bin_dir)
-	for i, entry := range mds {
-		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
-		if i == 0 {
-			slug_link := fmt.Sprintf("%s.html", entry.Slug)
-			generate_redirect(headname, slug_link)
-		}
-
-		f, err := os.Create(bin_name)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer f.Close()
-
-		f.WriteString(chunks[0])
-
-		date_str := entry.Date.Format(out_time_fmt)
-		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
-		f.WriteString(hdr_str)
-
-		f.WriteString("<div class=\"link-row\">")
-		generate_link_row(mds, i, f)
-		f.WriteString("</div>")
-
-		f.WriteString(chunks[1])
-
-		html := markdown.ToHTML(entry.Content, nil, nil)
-		f.WriteString(string(html))
-		f.WriteString(chunks[2])
-
-		for j, s := range slugs {
-			if j == i {
-				li_str := fmt.Sprintf("<a class=\"slug-entry selected\"><li><p>%s</p></li></a>", entry.Title)
-
-				f.WriteString(li_str)
-			} else {
-				f.WriteString(s)
-			}
-		}
-		f.WriteString(chunks[3])
-
-		generate_link_row(mds, i, f)
-
-		f.WriteString(chunks[4])
-	}
+	generate_posts(mds, string(html_template))
+	generate_rss(mds,   string(rss_template))
 
 	fmt.Printf("site generated\n")
 }

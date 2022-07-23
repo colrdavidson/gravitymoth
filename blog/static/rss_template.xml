@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+	<title>Gravity Moth Blog</title>
+	<link>https://gravitymoth.com/blog</link>
+	<description>Tool and Tech Deep Dives</description>
+	{{entries}}
+</channel>
+</rss>
