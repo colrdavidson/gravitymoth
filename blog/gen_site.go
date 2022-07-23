@@ -7,7 +7,6 @@ import (
 	"time"
 	"strings"
 	"sort"
-	"flag"
 	"io/ioutil"
 	"io/fs"
 	"github.com/gomarkdown/markdown"
@@ -39,18 +38,7 @@ func generate_redirect(bin_name string, to string) {
 	f.WriteString(redirect_str)
 }
 
-func generate_file(entry BlogEntry, chunks []string, slugs []string, sub_dir string, bin_name string) {
-}
-
 func main() {
-	local_ptr := flag.Bool("local", false, "uses local dir instead of /blog")
-	flag.Parse()
-
-	sub_dir := "/blog"
-	if *local_ptr {
-		sub_dir = ""
-	}
-
 	files, err := ioutil.ReadDir(static_dir)
 	if err != nil {
 		log.Fatal(err)
@@ -118,31 +106,36 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 		log.Fatal(err)
 	}
 
-	file_chunks := strings.Split(string(template), "{{content}}")
+	file_chunks := strings.Split(string(template), "{{header}}")
 	if len(file_chunks) != 2 {
+		log.Fatal("Template had no {{header}} tag!\n")
+	}
+
+	body_chunks := strings.Split(file_chunks[1], "{{content}}")
+	if len(body_chunks) != 2 {
 		log.Fatal("Template had no {{content}} tag!\n")
 	}
 
-	more_chunks := strings.Split(file_chunks[1], "{{slugs}}")
-	if len(more_chunks) != 2 {
+	slug_chunks := strings.Split(body_chunks[1], "{{slugs}}")
+	if len(slug_chunks) != 2 {
 		log.Fatal("Template had no {{slugs}} tag!\n")
 	}
 
-	nav_foot_chunks := strings.Split(more_chunks[1], "{{nav-foot}}")
+	nav_foot_chunks := strings.Split(slug_chunks[1], "{{nav-foot}}")
 	if len(nav_foot_chunks) != 2 {
 		log.Fatal("Template had no {{nav-foot}} tag!\n")
 	}
 
-	chunks := []string{file_chunks[0], more_chunks[0], nav_foot_chunks[0], nav_foot_chunks[1]}
+	chunks := []string{file_chunks[0], body_chunks[0], slug_chunks[0], nav_foot_chunks[0], nav_foot_chunks[1]}
 
 	sort.SliceStable(mds, func(i, j int) bool {
 		return mds[i].Date.After(mds[j].Date)
 	})
 
-	slugs := make([]string, len(mds))
+	slugs := make([]string, 0)
 	for _, md := range mds {
-		slug_link := fmt.Sprintf("%s/%s.html", sub_dir, md.Slug)
-		li_str := fmt.Sprintf("<li><a href=\"%s\">%s</a></li>", slug_link, md.Title)
+		slug_link := fmt.Sprintf("%s.html", md.Slug)
+		li_str := fmt.Sprintf("<a class=\"slug-entry\" href=\"%s\"><li><p>%s</p></li></a>", slug_link, md.Title)
 		slugs = append(slugs, li_str)
 	}
 
@@ -150,7 +143,7 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 	for i, entry := range mds {
 		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
 		if i == 0 {
-			slug_link := fmt.Sprintf("%s/%s.html", sub_dir, entry.Slug)
+			slug_link := fmt.Sprintf("%s.html", entry.Slug)
 			generate_redirect(headname, slug_link)
 		}
 
@@ -160,32 +153,54 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 		}
 		defer f.Close()
 
-		html := markdown.ToHTML(entry.Content, nil, nil)
-
 		f.WriteString(chunks[0])
 
 		date_str := entry.Date.Format(out_time_fmt)
 		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
 		f.WriteString(hdr_str)
-		f.WriteString(string(html))
-		f.WriteString(chunks[1])
-		for _, s := range slugs {
-			f.WriteString(s)
-		}
-		f.WriteString(chunks[2])
 
+		f.WriteString("<div class=\"link-row\">")
 		if i > 0 {
 			prev_entry := mds[i-1]
-			prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s/%s.html\">Newer</a>", sub_dir, prev_entry.Slug)
+			prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\">Newer</a>", prev_entry.Slug)
 			f.WriteString(prev_str)
 		}
 		if i < len(mds)-1 {
 			next_entry := mds[i+1]
-			next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s/%s.html\">Older</a>", sub_dir, next_entry.Slug)
+			next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older</a>", next_entry.Slug)
+			f.WriteString(next_str)
+		}
+		f.WriteString("</div>")
+
+		f.WriteString(chunks[1])
+
+		html := markdown.ToHTML(entry.Content, nil, nil)
+		f.WriteString(string(html))
+		f.WriteString(chunks[2])
+
+		for j, s := range slugs {
+			if j == i {
+				li_str := fmt.Sprintf("<a class=\"slug-entry selected\"><li><p>%s</p></li></a>", entry.Title)
+
+				f.WriteString(li_str)
+			} else {
+				f.WriteString(s)
+			}
+		}
+		f.WriteString(chunks[3])
+
+		if i > 0 {
+			prev_entry := mds[i-1]
+			prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\">Newer</a>", prev_entry.Slug)
+			f.WriteString(prev_str)
+		}
+		if i < len(mds)-1 {
+			next_entry := mds[i+1]
+			next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older</a>", next_entry.Slug)
 			f.WriteString(next_str)
 		}
 
-		f.WriteString(chunks[3])
+		f.WriteString(chunks[4])
 	}
 
 	fmt.Printf("site generated\n")
