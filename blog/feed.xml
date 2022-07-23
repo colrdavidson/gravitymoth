@@ -6,35 +6,23 @@
 	<description>Tool and Tech Deep Dives</description>
 	<item>
 		<title>Inspecting Data With Your Eyes</title>
-		<link rel="alternate" href="https://gravitymoth.com/blog/dataviz" />
-		<author>
-			<name>cloin</name>
-		</author>
-		<published>2022-07-15T21:00:00Z</published>
+		<link>https://gravitymoth.com/blog/dataviz</link>
+		<pubDate>15 Jul 22 21:00 PST</pubDate>
 	</item>
 	<item>
 		<title>DNS Domain Name Decoding</title>
-		<link rel="alternate" href="https://gravitymoth.com/blog/dnsdecode" />
-		<author>
-			<name>cloin</name>
-		</author>
-		<published>2022-02-18T12:00:00Z</published>
+		<link>https://gravitymoth.com/blog/dnsdecode</link>
+		<pubDate>18 Feb 22 12:00 PST</pubDate>
 	</item>
 	<item>
 		<title>DWARF Section Breakdown</title>
-		<link rel="alternate" href="https://gravitymoth.com/blog/dwarfsections" />
-		<author>
-			<name>cloin</name>
-		</author>
-		<published>2022-02-18T11:00:00Z</published>
+		<link>https://gravitymoth.com/blog/dwarfsections</link>
+		<pubDate>18 Feb 22 11:00 PST</pubDate>
 	</item>
 	<item>
 		<title>Starting a Blog</title>
-		<link rel="alternate" href="https://gravitymoth.com/blog/firstentry" />
-		<author>
-			<name>cloin</name>
-		</author>
-		<published>2022-02-18T10:00:00Z</published>
+		<link>https://gravitymoth.com/blog/firstentry</link>
+		<pubDate>18 Feb 22 10:00 PST</pubDate>
 	</item>
 </channel>
 </rss>
