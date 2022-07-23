@@ -2,6 +2,12 @@ title: Starting a Blog
 date: 02-18-2022 10:00 PST
 slug: firstentry
 
-Oh boy! Started a blog! It was well-past time to start documenting some of my goofier code
-adventures, if for nothing else than my sanity. When I have to go back to this stuff
-5+ years later, it'll be good to have a reference. If you get value out of it too, awesome!
+Oh boy! We're doing neat things for everybody to see now!
+It was well-past time to start documenting some of my code adventures,
+if for nothing else than my sanity. I've got a lovely new logo, a domain, and a dream. If all goes well,
+I'm hoping to ship some neat code inspection tools to make dealing with weird, complex bugs on linux
+less of a headache.
+
+If I can make this stuff work, sweet! Worst-case, I now have a lovely place to dump all my
+weird discoveries, rants about overly complicated specs, and musings about better ways to
+build tooling.
