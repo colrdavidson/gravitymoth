@@ -38,6 +38,19 @@ func generate_redirect(bin_name string, to string) {
 	f.WriteString(redirect_str)
 }
 
+func generate_link_row(entries []BlogEntry, idx int, f *os.File) {
+	if idx > 0 {
+		prev_entry := entries[idx-1]
+		prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\"><i class=\"fa fa-arrow-left\"></i>Newer</a>", prev_entry.Slug)
+		f.WriteString(prev_str)
+	}
+	if idx < len(entries)-1 {
+		next_entry := entries[idx+1]
+		next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older<i class=\"fa fa-arrow-right\"/></i></a>", next_entry.Slug)
+		f.WriteString(next_str)
+	}
+}
+
 func main() {
 	files, err := ioutil.ReadDir(static_dir)
 	if err != nil {
@@ -160,16 +173,7 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 		f.WriteString(hdr_str)
 
 		f.WriteString("<div class=\"link-row\">")
-		if i > 0 {
-			prev_entry := mds[i-1]
-			prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\">Newer</a>", prev_entry.Slug)
-			f.WriteString(prev_str)
-		}
-		if i < len(mds)-1 {
-			next_entry := mds[i+1]
-			next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older</a>", next_entry.Slug)
-			f.WriteString(next_str)
-		}
+		generate_link_row(mds, i, f)
 		f.WriteString("</div>")
 
 		f.WriteString(chunks[1])
@@ -189,16 +193,7 @@ content, Title: string(title), Date: date, Slug: string(slug)}
 		}
 		f.WriteString(chunks[3])
 
-		if i > 0 {
-			prev_entry := mds[i-1]
-			prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\">Newer</a>", prev_entry.Slug)
-			f.WriteString(prev_str)
-		}
-		if i < len(mds)-1 {
-			next_entry := mds[i+1]
-			next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older</a>", next_entry.Slug)
-			f.WriteString(next_str)
-		}
+		generate_link_row(mds, i, f)
 
 		f.WriteString(chunks[4])
 	}

@@ -345,12 +345,22 @@ nav {
 	justify-content: space-between;
 }
 
+.link-row > a {
+	text-decoration: none;
+}
+
 .newer-link {
 	margin-right: auto;
+}
+.newer-link > i {
+	margin-right: 0.25em;
 }
 
 .older-link {
 	margin-left: auto;
+}
+.older-link > i {
+	margin-left: 0.25em;
 }
 
 h1 {
