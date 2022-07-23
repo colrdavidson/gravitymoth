@@ -8,21 +8,25 @@
 		<title>Inspecting Data With Your Eyes</title>
 		<link>https://gravitymoth.com/blog/dataviz</link>
 		<pubDate>Fri, 15 Jul 2022 21:00:00 +0000</pubDate>
+		<guid isPermaLink="true">https://gravitymoth.com/blog/dataviz</guid>
 	</item>
 	<item>
 		<title>DNS Domain Name Decoding</title>
 		<link>https://gravitymoth.com/blog/dnsdecode</link>
 		<pubDate>Fri, 18 Feb 2022 12:00:00 +0000</pubDate>
+		<guid isPermaLink="true">https://gravitymoth.com/blog/dnsdecode</guid>
 	</item>
 	<item>
 		<title>DWARF Section Breakdown</title>
 		<link>https://gravitymoth.com/blog/dwarfsections</link>
 		<pubDate>Fri, 18 Feb 2022 11:00:00 +0000</pubDate>
+		<guid isPermaLink="true">https://gravitymoth.com/blog/dwarfsections</guid>
 	</item>
 	<item>
 		<title>Starting a Blog</title>
 		<link>https://gravitymoth.com/blog/firstentry</link>
 		<pubDate>Fri, 18 Feb 2022 10:00:00 +0000</pubDate>
+		<guid isPermaLink="true">https://gravitymoth.com/blog/firstentry</guid>
 	</item>
 </channel>
 </rss>
