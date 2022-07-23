@@ -144,10 +144,9 @@ func generate_rss(entries []BlogEntry, rss_template string) {
 	f.WriteString(chunks[0])
 
 	for i, entry := range entries {
-		date_str := entry.Date.Format(time.RFC3339)	
+		date_str := entry.Date.Format(time.RFC822)	
 		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
-		author_str := "cloin"
-		post_str := fmt.Sprintf("<item>\n\t\t<title>%s</title>\n\t\t<link rel=\"alternate\" href=\"%s\" />\n\t\t<author>\n\t\t\t<name>%s</name>\n\t\t</author>\n\t\t<published>%s</published>\n\t</item>", entry.Title, post_link, author_str, date_str)
+		post_str := fmt.Sprintf("<item>\n\t\t<title>%s</title>\n\t\t<link>%s</link>\n\t\t<pubDate>%s</pubDate>\n\t</item>", entry.Title, post_link, date_str)
 
 		if i != 0 {
 			f.WriteString("\n\t")
