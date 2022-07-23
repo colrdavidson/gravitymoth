@@ -4,7 +4,6 @@
 	<title>Gravity Moth Blog</title>
 	<link>https://gravitymoth.com/blog</link>
 	<description>Tool and Tech Deep Dives</description>
-	<atom:link href="https://gravitymoth.com/blog/rss.xml" rel="self" type="application/rss+xml" />
 	{{entries}}
 </channel>
 </rss>
