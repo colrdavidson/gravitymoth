@@ -26,6 +26,7 @@ const static_dir = "static/"
 const bin_dir = "docs/"
 const in_time_fmt = "01-02-2006 15:04 MST"
 const out_time_fmt = "Mon, 02 Jan 2006"
+const rss_time_fmt = "Mon, 02 Jan 2006 15:04:05 -0700"
 
 func generate_redirect(bin_name string, to string) {
 	f, err := os.Create(bin_name)
@@ -144,7 +145,7 @@ func generate_rss(entries []BlogEntry, rss_template string) {
 	f.WriteString(chunks[0])
 
 	for i, entry := range entries {
-		date_str := entry.Date.Format(time.RFC822)	
+		date_str := entry.Date.Format(rss_time_fmt)	
 		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
 		post_str := fmt.Sprintf("<item>\n\t\t<title>%s</title>\n\t\t<link>%s</link>\n\t\t<pubDate>%s</pubDate>\n\t</item>", entry.Title, post_link, date_str)
 
