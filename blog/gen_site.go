@@ -109,7 +109,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 			desc_str := fmt.Sprintf(`<meta property="og:description" content="%s" />`, entry.Description)
 			f.WriteString(desc_str)
 
-			title_str := fmt.Sprintf(`<meta property="og:title" content="%s" />`, entry.Title)
+			title_str := fmt.Sprintf(`<meta property="og:title" content="Gravity Moth Blog -- %s" />`, entry.Title)
 			f.WriteString(title_str)
 
 			image_str := fmt.Sprintf(`<meta property="og:image" content="https://gravitymoth.com/media/%s" />`, entry.Thumbnail)
