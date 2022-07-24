@@ -1,6 +1,8 @@
 title: Inspecting Data With Your Eyes
 date: 07-15-2022 21:00 PST
 slug: dataviz
+desc: Messing around with PNM to visualize binaries as images
+img: swizzle.png
 
 I run programs all day every day. Programs are a computer user's bread and butter. 
 I *rarely* stop to really take a look at them though. What does a program actually look like? 

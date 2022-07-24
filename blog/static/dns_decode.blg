@@ -1,6 +1,7 @@
 title: DNS Domain Name Decoding
 date: 02-18-2022 12:00 PST
 slug: dnsdecode
+desc: Breaking down the process of decoding DNS domain names
 
 As part of my recent work on `core:net` for [Odin](https://odin-lang.org), I've spent a chunk of time digging through a mountain of RFCs
 to get DNS domain name decoding and encoding working.

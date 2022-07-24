@@ -1,6 +1,7 @@
 title: DWARF Section Breakdown
 date: 02-18-2022 11:00 PST
 slug: dwarfsections
+desc: Quick introduction to DWARF sections to prep for beefier upcoming DWARF guides
 
 I've spend the last month or two fiddling with my own custom debugger, learning to parse DWARF.
 DWARF is a very flexible format, made to support a wide variety of languages out of the box, but it pays for that
