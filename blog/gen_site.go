@@ -110,7 +110,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 			f.WriteString(desc_str)
 
 			title_str := fmt.Sprintf(`<meta property="og:title" content="Gravity Moth - %s" />`, entry.Title)
-			twitter_title_str := fmt.Sprintf(`<meta property="twitter:title" content="Gravity Moth - %s" />`, entry.Title)
+			twitter_title_str := fmt.Sprintf(`<meta property="twitter:title" content="%s" />`, entry.Title)
 			f.WriteString(title_str)
 			f.WriteString(twitter_title_str)
 
