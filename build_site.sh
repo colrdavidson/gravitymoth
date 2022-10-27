@@ -13,3 +13,7 @@ cd ./blog
 ./build.sh
 ./gen_site
 cp -r docs ../public/blog
+cd -
+
+# Setup spall
+cp -r spall public/spall
