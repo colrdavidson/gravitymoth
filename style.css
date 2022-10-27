@@ -7,6 +7,7 @@
 	--link-color:  #0083B7;
 
 	--font-color:  #222222;
+	--font-dark-color:  #222222;
 	--nav-light-font-color:  var(--font-color);
 	--nav-font-color:  whitesmoke;
 
@@ -24,6 +25,7 @@
 		--link-color:  #0083B7;
 
 		--font-color:  #bebebe;
+		--font-dark-color:  #222222;
 		--nav-light-font-color:  var(--font-color);
 		--nav-font-color:  whitesmoke;
 
@@ -517,6 +519,7 @@ p > img {
 .warning {
 	padding: 1em;
 	background-color: pink;
+	color: var(--font-dark-color);
 	border: 1px solid red;
 	border-radius: 10px;
 	margin-bottom: 2em;
