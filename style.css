@@ -73,6 +73,10 @@ nav {
 	color: var(--nav-font-color);
 	text-decoration: none;
 }
+.nav-entries > a {
+	color: var(--nav-font-color);
+	text-decoration: none;
+}
 
 .nav-link.top {
 	font-size: 1.5em;
@@ -80,9 +84,12 @@ nav {
 	padding-right: 1em;
 }
 
+.nav-entries {
+	margin-left: auto;
+}
+
 .nav-link.entry {
 	font-size: 1.25em;
-	margin-left: auto;
 	padding-right: 1em;
 }
 
@@ -110,6 +117,10 @@ nav {
 .dropdown.entry {
 	color: var(--nav-font-color);
 	text-decoration: none;
+	margin-left: 1em;
+}
+.dropdown.entry:first-child {
+	margin-left: 0.5em;
 }
 
 .root {
@@ -129,6 +140,7 @@ nav {
 }
 .banner {
 	background-color: var(--logo-bg);
+	margin-bottom: 1em;
 }
 
 #header {
@@ -363,22 +375,29 @@ nav {
 	margin-left: 0.25em;
 }
 
-h1 {
+h1, h2, h3, h4, h5 {
 	margin: 0;
 	padding: 0;
+}
+
+h1 {
 	margin-bottom: 0.25rem;
 }
 
+h2 {
+	margin-bottom: 1rem;
+}
+
 h3 {
-	margin: 0;
-	padding: 0;
+	margin-bottom: 0.5rem;
+}
+
+h4 {
 	margin-bottom: 0.5rem;
 }
 
 h5 {
-	margin: 0;
-	padding: 0;
-	margin-bottom: 2rem;
+	margin-bottom: 0.5rem;
 }
 
 p {
@@ -443,6 +462,12 @@ img {
 	max-height: 100%;
 }
 
+#content > img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 p+table {
 	margin-top: -1.0em;
 }
@@ -468,4 +493,31 @@ td {
 p > img {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
+}
+
+.spall-link {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	margin-bottom: 1em;
+}
+
+.spall-link > a {
+	padding: 1em;
+	border-radius: 5px;
+	background-color: var(--nav-color);
+	color: var(--nav-font-color);
+	text-decoration: none;
+}
+
+#content > img {
+	margin-bottom: 1em;
+}
+
+.warning {
+	padding: 1em;
+	background-color: pink;
+	border: 1px solid red;
+	border-radius: 10px;
+	margin-bottom: 2em;
 }

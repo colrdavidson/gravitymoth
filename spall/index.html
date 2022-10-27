@@ -1,0 +1,109 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<meta property="og:type"        content="website" />
+		<meta property="og:site_name"   content="Gravity Moth" />
+		<meta property="og:title"       content="Gravity Moth" />
+		<meta property="og:description" content="Debug and Viz Tools" />
+		<meta property="og:url"         content="https://gravitymoth.com" />
+		<meta property="og:image"       content="https://gravitymoth.com/media/logo_bg.png" />
+
+		<link rel="stylesheet" href="../style.css">
+		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="header">
+				<h1>spall</h1>
+				<h5>spall is a profiler, a magnifying glass for performance problems</h5>
+			</section>
+			<section id="content">
+				<img src="../media/recent_spall.gif" />
+				<p>This is spall loading a 200 MB trace file and getting basic runtime stats for about a minute of recorded program runtime in real-time</p>
+
+				<p class="warning">Heads up! Spall isn't a great user-experience 
+				on mobile due to the serious memory and screen constraints most 
+				mobile devices have. If you've got a laptop or a desktop, you 
+				should use that instead!</p>
+
+				<h3>For Web-Profiler Vets</h3>
+				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
+				spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
+				off and running with your existing files, feel free to jump right in.</p>
+				<div class="spall-link">
+					<a href="/spall">Start Spall</a>
+				</div>
+
+				<h3>For Everybody Else</h3>
+				<p>If you'd like more of a briefer on profilers and how to use spall, keep reading!</p>
+
+				<p>Profilers <i>typically</i> come in two flavors, sampling or tracing (or sometimes a hybrid of the two). spall (at least right now) is a tracing profiler, which means that
+				to use it, you mark down when your functions begin and end, write them to a file, and then spall will render them out on a timeline for you.</p>
+
+				<p>spall includes a small, single-header C library 
+				<a href="https://github.com/colrdavidson/spall/blob/master/spall.h">here</a> 
+				to make that easy. For relatively simple programs using clang or gcc, you can 
+				use <code>-finstrument-functions</code> to instrument your whole program quickly. 
+				More language support is planned soon, so keep an eye out!</p>
+				<p>There are some very simple examples over <a href="https://github.com/colrdavidson/spall/blob/master/examples/">here</a>.</p>
+
+				<h3>Basic Features</h3>
+
+				<p>Once you've got your program instrumented, you can drag-and-drop
+				or click "open file" at the top left, and select your .spall or .json file,
+				and get started.</p>
+
+				<h4>Navigation</h4>
+				<img src="../media/panzoom.gif" />
+				<p>Clicking and dragging moves the view around and scrolling zooms in and out</p>
+
+				<h4>Event Selection</h4>
+				<img src="../media/singleselect.gif" />
+				<p>Clicking on an event brings up some basic information about it</p>
+
+				<h4>Event Multiselection</h4>
+				<img src="../media/multiselect.gif" />
+				<p>Shift-click allows you to select a chunk of events to run stats on</p>
+
+				<h4>Get All Stats</h4>
+				<img src="../media/crunchstats.gif" />
+				<p>Clicking on the "get stats for the whole file" button at the top left runs stats for your whole program</p>
+
+				<h4>That's All!</h4>
+				<p>You've got the basics at this point, go have fun!</p>
+
+				<div class="spall-link">
+					<a href="/spall">Start Spall</a>
+				</div>
+			</section>
+		</div>
+	</body>
+</html>
