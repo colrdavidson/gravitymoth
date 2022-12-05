@@ -149,10 +149,41 @@ nav {
 	grid-row: 1;
 	grid-column: 1/2;
 	margin-top: 2.5em;
+	margin-bottom: 0em;
 }
 
-#header > h5 {
-	margin-bottom: 1.5em;
+.header-line {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.header-line > h1 {
+	margin-right: 0.25em;
+}
+.github-link {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	font-size: 16pt;
+	text-decoration: none;
+	color: black;
+	margin-right: 0.125em;
+}
+.github-link:hover {
+	color: grey;
+}
+.sponsors-link {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	font-size: 16pt;
+	text-decoration: none;
+	color: deeppink;
+}
+.sponsors-link:hover {
+	color: hotpink;
 }
 
 #banner-header {
@@ -524,3 +555,4 @@ p > img {
 	border-radius: 10px;
 	margin-bottom: 2em;
 }
+
