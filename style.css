@@ -500,6 +500,10 @@ figure {
 	margin-right: 0;
 }
 
+figure > .video-wrapper > video {
+	margin-bottom: 0;
+}
+
 figcaption {
 	margin-top: 0.5em;
 }
@@ -601,6 +605,8 @@ p > img {
 	padding-bottom: 56.25%;
 	height: 0;
 	overflow: hidden;
+	margin-bottom: 0.25em;
+	margin-top: -1em;
 }
 .video-frame > iframe {
 	position: absolute;
