@@ -65,7 +65,7 @@
 
 				<h3>Live Demo</h3>
 				<p>spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
-				going head-to-head against perfetto, and handily won, with buttery smooth frametimes and tiny load-times for huge files!</p>
+				going head-to-head against perfetto, and handily won, with buttery smooth frames and tiny load-times for huge files!</p>
 				<div class="video-frame">
 					<iframe 
 						title="vimeo-player" 
@@ -78,7 +78,7 @@
 				<a href="https://guide.handmade-seattle.com/c/2022/">Handmade Seattle's Video Guide</a></p>
 				<div class="info">
 					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
-					<a href="https://colrdavidson.github.io">portfolio!</a></p>
+					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
 				</div>
 
 				<h2>Jumping Right In!</h2>
@@ -92,7 +92,7 @@
 				<h3>For Web-Profiler Vets</h3>
 				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
 				spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
-				off and running with your existing files, feel free to jump right in.</p>
+				off and running with your existing files and JSON trace dumping code. If you use chrome's sampling profiler for bigger captures and you're struggling to view them, spall can ingest and display those files too!</p>
 				<div class="spall-link">
 					<a href="/spall/spall.html">Start spall</a>
 				</div>
@@ -107,12 +107,12 @@
 
 				<p>The common advice for profilers is to sample first, and then trace sparingly to narrow in on the problem,
 				but if your traces are cheap enough (spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
-				when configured correctly) for many programs, you can often skip right to tracing and get far more useful data.</p>
+				when configured correctly), you can often skip right to tracing and get far more useful data.</p>
 
 				<p>spall includes a <a href="https://github.com/colrdavidson/spall/blob/master/spall.h">small, single-header C library</a>,
-				to make tracing easy. For relatively simple programs using clang or gcc, you can 
-				use <code>-finstrument-functions</code> to instrument your whole program quickly. For more complex programs, you manually instrument
-				specific parts of your code to reduce your trace sizes and keep your runtimes a little more accurate.</p>
+				to make tracing easy. For relatively simple programs using clang or gcc, you can use <code>-finstrument-functions</code>
+				to instrument your whole program quickly. For more complex programs, you manually instrument specific parts of your code 
+				to reduce your trace sizes and keep your runtimes a little more accurate.</p>
 
 				<p>There are some very simple <a href="https://github.com/colrdavidson/spall/blob/master/examples/">examples</a> to get
 				started with tracing! (If you can't bind against the C header in your project, don't worry, more language support is planned soon!)</p>
@@ -169,7 +169,7 @@
 				with the source yourself!</p>
 				<div class="info">
 					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
-					<a href="https://colrdavidson.github.io">portfolio!</a></p>
+					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
 				</div>
 			</section>
 		</div>
