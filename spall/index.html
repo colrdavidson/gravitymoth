@@ -54,62 +54,122 @@
 				<h5>spall is a profiler, a magnifying glass for performance problems</h5>
 			</section>
 			<section id="content">
-				<img src="../media/recent_spall.gif" />
-				<p>This is spall loading a 200 MB trace file and getting basic runtime stats for about a minute of recorded program runtime in real-time</p>
+				<figure>
+					<div class="video-wrapper">
+						<video autoplay loop muted playsinline>
+							<source src="../media/recent_spall.mp4" type="video/mp4">
+						</video>
+					</div>
+					<figcaption>spall loading a 200 MB trace file, and getting stats for a minute of program runtime</figcaption>
+				</figure>
 
-				<p class="warning">Heads up! Spall isn't a great user-experience 
-				on mobile due to the serious memory and screen constraints most 
-				mobile devices have. If you've got a laptop or a desktop, you 
-				should use that instead!</p>
+				<h3>Live Demo</h3>
+				<p>spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
+				going head-to-head against perfetto, and handily won, with buttery smooth frametimes and tiny load-times for huge files!</p>
+				<div class="video-frame">
+					<iframe 
+						title="vimeo-player" 
+						src="https://player.vimeo.com/video/776796857?h=eb79b4ca63"
+						frameborder="0"
+						allowfullscreen>
+					</iframe>
+				</div>
+				<p>Check out more excellent talks and demos like spall over at 
+				<a href="https://guide.handmade-seattle.com/c/2022/spall/">Handmade Seattle's Video Guide</a></p>
+				<div class="info">
+					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
+					<a href="https://colrdavidson.github.io">portfolio!</a></p>
+				</div>
+
+				<h2>Jumping Right In!</h2>
+				<div class="warning">
+					<h4>Heads up!</h4>
+					<p>spall isn't very mobile-friendly due to the serious memory and screen constraints most 
+					mobile devices have. If you've got a desktop, you should use that instead!</p>
+				</div>
+
 
 				<h3>For Web-Profiler Vets</h3>
 				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
 				spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
 				off and running with your existing files, feel free to jump right in.</p>
 				<div class="spall-link">
-					<a href="/spall/spall.html">Start Spall</a>
+					<a href="/spall/spall.html">Start spall</a>
 				</div>
 
 				<h3>For Everybody Else</h3>
-				<p>If you'd like more of a briefer on profilers and how to use spall, keep reading!</p>
+				<p>If you want to learn to use spall and get a quick briefer on profilers, keep reading!</p>
 
-				<p>Profilers <i>typically</i> come in two flavors, sampling or tracing (or sometimes a hybrid of the two). spall (at least right now) is a tracing profiler, which means that
-				to use it, you mark down when your functions begin and end, write them to a file, and then spall will render them out on a timeline for you.</p>
+				<p>Profilers <i>typically</i> come in two flavors, <b>sampling</b> and <b>tracing</b>. spall is a frontend with support
+				for both tracing and sampling profiler libraries. Spall is mostly used for tracing, where function begin and ends get timed
+				and written to a file. Sampling, where the profiler takes a snapshot of your program on an interval, can be a little easier to 
+				configure but can miss shorter-lived functions completely, and provides very little data for programs with short runtimes.</p>
 
-				<p>spall includes a small, single-header C library 
-				<a href="https://github.com/colrdavidson/spall/blob/master/spall.h">here</a> 
-				to make that easy. For relatively simple programs using clang or gcc, you can 
-				use <code>-finstrument-functions</code> to instrument your whole program quickly. 
-				More language support is planned soon, so keep an eye out!</p>
-				<p>There are some very simple examples over <a href="https://github.com/colrdavidson/spall/blob/master/examples/">here</a>.</p>
+				<p>The common advice for profilers is to sample first, and then trace sparingly to narrow in on the problem,
+				but if your traces are cheap enough (spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
+				when configured correctly) for many programs, you can often skip right to tracing and get far more useful data.</p>
+
+				<p>spall includes a <a href="https://github.com/colrdavidson/spall/blob/master/spall.h">small, single-header C library</a>,
+				to make tracing easy. For relatively simple programs using clang or gcc, you can 
+				use <code>-finstrument-functions</code> to instrument your whole program quickly. For more complex programs, you manually instrument
+				specific parts of your code to reduce your trace sizes and keep your runtimes a little more accurate.</p>
+
+				<p>There are some very simple <a href="https://github.com/colrdavidson/spall/blob/master/examples/">examples</a> to get
+				started with tracing! (If you can't bind against the C header in your project, don't worry, more language support is planned soon!)</p>
+
+				<p>If you want to sample and you're on a platform with <code>dtrace</code> support, there's a lovely community supported library, 
+				<a href="https://github.com/bvisness/dtrace2spall">dtrace2spall</a>, that you can use to get started without changing your code.</p>
 
 				<h3>Basic Features</h3>
 
 				<p>Once you've got your program instrumented, you can drag-and-drop
-				or click "open file" at the top left, and select your .spall or .json file,
-				and get started.</p>
+				or click "open file" at the top left, and select your <code>spall</code> or <code>json</code> file, and get started.</p>
 
 				<h4>Navigation</h4>
-				<img src="../media/panzoom.gif" />
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/panzoom.mp4" type="video/mp4">
+					</video>
+				</div>
 				<p>Clicking and dragging moves the view around and scrolling zooms in and out</p>
 
 				<h4>Event Selection</h4>
-				<img src="../media/singleselect.gif" />
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/singleselect.mp4" type="video/mp4">
+					</video>
+				</div>
 				<p>Clicking on an event brings up some basic information about it</p>
 
 				<h4>Event Multiselection</h4>
-				<img src="../media/multiselect.gif" />
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/multiselect.mp4" type="video/mp4">
+					</video>
+				</div>
 				<p>Shift-click allows you to select a chunk of events to run stats on</p>
 
 				<h4>Get All Stats</h4>
-				<img src="../media/crunchstats.gif" />
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/crunchstats.mp4" type="video/mp4">
+					</video>
+				</div>
 				<p>Clicking on the "get stats for the whole file" button at the top left runs stats for your whole program</p>
 
 				<h4>That's All!</h4>
 				<p>You've got the basics at this point, go have fun!</p>
 
 				<div class="spall-link">
-					<a href="/spall/spall.html">Start Spall</a>
+					<a href="/spall/spall.html">Start spall</a>
+				</div>
+
+				<h3>Extra Goodies</h3>
+				<p>The web-version of spall is available on <a href="https://github.com/colrdavidson/spall">github</a> if you want to go play 
+				with the source yourself!</p>
+				<div class="info">
+					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
+					<a href="https://colrdavidson.github.io">portfolio!</a></p>
 				</div>
 			</section>
 		</div>
