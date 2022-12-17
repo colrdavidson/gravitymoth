@@ -33,7 +33,7 @@ Once you find a section that seems relevant, there's *this* lovely thing:
 It gets you all the pages in all the sections you've got, in a horrible, unsorted list,
 and you can filter them down with `grep`.
 
-If you want to see what's in section 8, on my machine, System administration commands, this
+If you want to see what's in section 8 (on my machine, "System administration commands"), this
 will filter the list down for you:
 `man -k . | grep -F '(8)' | less`
 
