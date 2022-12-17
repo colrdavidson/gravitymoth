@@ -4,6 +4,7 @@
 	<title>Gravity Moth Blog</title>
 	<link>https://gravitymoth.com/blog</link>
 	<description>Tool and Tech Deep Dives</description>
+	<item><title>The Missing Linux Manual Pt 1</title><link>https://gravitymoth.com/blog/missinglinux1</link><description>Things The Greybeards Forgot To Tell You</description><pubDate>Sat, 17 Dec 2022 10:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/missinglinux1</guid></item>
 	<item><title>Inspecting Data With Your Eyes</title><link>https://gravitymoth.com/blog/dataviz</link><description>Messing around with PNM to visualize binaries as images</description><pubDate>Fri, 15 Jul 2022 21:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/dataviz</guid></item>
 	<item><title>DNS Domain Name Decoding</title><link>https://gravitymoth.com/blog/dnsdecode</link><description>Breaking down the process of decoding DNS domain names</description><pubDate>Fri, 18 Feb 2022 12:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/dnsdecode</guid></item>
 	<item><title>DWARF Section Breakdown</title><link>https://gravitymoth.com/blog/dwarfsections</link><description>Quick introduction to DWARF sections to prep for beefier upcoming DWARF guides</description><pubDate>Fri, 18 Feb 2022 11:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/dwarfsections</guid></item>

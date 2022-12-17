@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<meta property="og:type"  content="article" /><meta property="og:url" content="https://gravitymoth.com/blog/missinglinux1" /><meta property="og:description" content="Things The Greybeards Forgot To Tell You" /><meta property="og:title" content="The Missing Linux Manual Pt 1" /><meta property="twitter:title" content="The Missing Linux Manual Pt 1" /><meta property="og:image" content="https://gravitymoth.com/media/logo_bg.png" /><meta property="og:locale" content="en_US"><meta property="og:site_name" content="Gravity Moth"><meta property="twitter:card" content="summary">
+
+		<link rel="stylesheet" href="../style.css" />
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="header"><h1>The Missing Linux Manual Pt 1</h1><h5>Sat, 17 Dec 2022</h5><div class="link-row"><a class="older-link" href="dataviz.html">Older<i class="fa fa-arrow-right"/></i></a></div></section>
+			<section id="content"><p>The more I&rsquo;ve learned, the more history I&rsquo;ve gathered, the more general frustration
+and annoyance I&rsquo;ve had at the people making the systems of today.</p>
+
+<p>As far as I can tell, all the juicy computer knowledge died during the Eternal September
+that started around the dotcom boom. Most of this stuff I&rsquo;ve learned the hard way,
+fighting uphill, reverse engineering terrible code, and stumbling randomly into blogs
+on the internet, but it&rsquo;s stuff that <em>needs</em> to be shared.</p>
+
+<p>Here&rsquo;s a few of the things I use regularly day-to-day, that I learned the hard way</p>
+
+<h2>How to RTFM</h2>
+
+<p>Have you ever stumbled into the Linux community and been told to RTFM? Here&rsquo;s the bit they
+forgot to tell you: HOW TO READ THE MANUAL.</p>
+
+<p>For years, I played guess-and-check, trying to find the right manpage for libc functions,
+or the one for syscalls, poking in each number sequentially and hoping I hit the right page.
+The numbers mean things!</p>
+
+<p>Manpages are split into &ldquo;sections&rdquo;, each of which contain a series of pages on all the useful
+things your boxen can do.</p>
+
+<p>There&rsquo;s a list of all the sections you can get to, available at <code>man man</code>.
+Once you find a section that seems relevant, there&rsquo;s <em>this</em> lovely thing:
+<code>man -k .</code></p>
+
+<p>It gets you all the pages in all the sections you&rsquo;ve got, in a horrible, unsorted list,
+and you can filter them down with <code>grep</code>.</p>
+
+<p>If you want to see what&rsquo;s in section 8, on my machine, System administration commands, this
+will filter the list down for you:
+<code>man -k . | grep -F '(8)' | less</code></p>
+
+<p><code>less</code> lets you page through it, and read all the lovely 1-liner summaries for your pages.</p>
+
+<h2>Tracing for Plebs</h2>
+
+<p>You&rsquo;ve got some <em>amazing</em> tools at your fingertips that you may never have used!
+Allow me to introduce you to <code>strace</code>, <code>ltrace</code>, and <code>ldd</code>, some of my best friends when trying to
+figure out what&rsquo;s going on in some hairy undocumented GNU-code.</p>
+
+<p><code>ltrace</code> will dump all the calls made to shared libraries, along with their arguments.
+On Linux <em>most</em> of the time you&rsquo;re running a dynamic binary, linking against a shared libc.
+What that means, is that you can get track and print many of the calls made to libc as your program runs,
+allowing you to figure out where it allocates, what files it opens, and a few other lovely things.</p>
+
+<p>I&rsquo;ve used <code>ltrace</code> to dump all of the functions that gdb calls on runtime to help break down how it finds
+debug symbols on a modern system, where debug information and the libraries themselves are split.</p>
+
+<p>Ready for some <em>real</em> magic?</p>
+
+<pre><code>ltrace -o dump gdb ./a.out
+awk -F&quot;(&quot; '{print $1}' &lt; dump &gt; dump2
+sort dump2 | uniq -c | sort -n
+</code></pre>
+
+<p>Here we&rsquo;ve asked gdb to trace something, and dumped every library call it made,
+chopped the output to only function names, sorted them alphabetically and counted them,
+and then sorted them numerically</p>
+
+<p>Gives us an amazing picture of why gdb boots so darn slow. Just a few of gdb&rsquo;s favorite calls
+before it throws the user a prompt:</p>
+
+<pre><code> 120200 strcmp
+  97600 strlen
+  79968 memcmp
+  25217 memcpy
+  15063 malloc
+   4785 strstr
+   4200 strncmp
+   3253 strcasecmp
+</code></pre>
+
+<p><code>strace</code> is another <em>awesome</em> tool, giving you deep introspection into syscalls your program uses.
+If you&rsquo;re one of the lucky few able to make/ship static binaries, or if your compiler just likes to inline
+all the things, <code>ltrace</code> might not catch everything important.</p>
+
+<p>Want to know what your dynamic linker does when it boots your program?
+Want to know how gdb stops the kernel from randomizing your program&rsquo;s address space, to make debugging more consistent?
+<code>strace</code> is here to save the day! There&rsquo;s some handy stuff in there!</p>
+
+<p>Just call it with <code>strace -o dump &lt;my_program&gt;</code> and you&rsquo;ll get quite a list</p>
+
+<p>strace uses the ptrace syscall tracer, <code>ptrace(PTRACE_SYSCALL, ...)</code> under the hood, and you can write your own
+tools the same way.</p>
+
+<p><code>ldd</code> is pretty simple, it tells you all the dynamic libraries that a program will load to run.
+Hello World on my machine pulls in:</p>
+
+<pre><code>linux-vdso.so.1
+libc.so.6
+/lib64/ld-linux-x86-64.so.2
+</code></pre>
+
+<p>Linux uses the VDSO to provide virtual syscalls like <code>gettimeofday</code>, without jumping to the kernel<br>
+<code>ld-linux-x86-64</code> is the dynamic linker this program needed, to load and run<br>
+<code>libc</code> is where things like <code>printf</code>, <code>malloc</code>, and <code>free</code> live</p>
+
+<h2>Where&rsquo;s My Missing Sock?</h2>
+
+<p>Ever been stuck trying to find a header file you <em>know</em> lives somewhere on your system?
+Just want to read the definitions for the things you&rsquo;re pulling in?
+Can&rsquo;t remember the atrocious syntax for <code>find</code>? Try <code>locate</code>!
+<code>locate</code> indexes your drive so it can give you results very quickly, and searches by filename</p>
+
+<p>Want to find <code>unistd.h</code>? <code>locate unistd.h</code> has you covered.</p>
+
+<h2>ELF: How Things Do The Things</h2>
+
+<p>ELF is the object file format on Linux. It is used for both executables and libraries, and there are handy tools
+for digging into both</p>
+
+<p><code>objdump</code> is a little niche, but for certain types of problems, it&rsquo;s a lifesaver.
+<code>objdump -d -M intel &lt;my_binary&gt;</code> will dump out the assembly for you, useful for spot-checking compiled code
+(and with intel syntax, to boot)
+<code>objdump -x &lt;my_binary&gt;</code> will print all the sections in your binary, and you can see symbols just a little further down,
+handy for double-checking that you exported your functions correctly for your library.</p>
+
+<p><code>readelf</code> covers a lot of the same ground, but formats the information a little differently,
+occasionally I&rsquo;ll use it as an alternative to <code>objdump</code> to get a new angle on the data
+when writing binary generation tools.</p>
+
+<p>If you&rsquo;re ready to ship, <code>strip</code> can slim down your ELF files a little.
+<code>strip --strip-unneeded</code> can pull out symbols that you don&rsquo;t actually use, often making your binary much much smaller</p>
+</section>
+			<section id="sidebar">
+				<ul><a class="slug-entry selected"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
+			</section>
+			<section id="nav-footer" class="link-row"><a class="older-link" href="dataviz.html">Older<i class="fa fa-arrow-right"/></i></a></section>
+		</div>
+	</body>
+</html>
