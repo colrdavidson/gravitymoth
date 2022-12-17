@@ -1,0 +1,132 @@
+title: The Missing Linux Manual Pt 1
+date: 12-17-2022 10:00 PST
+slug: missinglinux1
+desc: Things The Greybeards Forgot To Tell You
+
+The more I've learned, the more history I've gathered, the more general frustration
+and annoyance I've had at the people making the systems of today.
+
+As far as I can tell, all the juicy computer knowledge died during the Eternal September
+that started around the dotcom boom. Most of this stuff I've learned the hard way, 
+fighting uphill, reverse engineering terrible code, and stumbling randomly into blogs 
+on the internet, but it's stuff that *needs* to be shared.
+
+
+Here's a few of the things I use regularly day-to-day, that I learned the hard way
+
+## How to RTFM
+
+Have you ever stumbled into the Linux community and been told to RTFM? Here's the bit they
+forgot to tell you: HOW TO READ THE MANUAL.
+
+For years, I played guess-and-check, trying to find the right manpage for libc functions,
+or the one for syscalls, poking in each number sequentially and hoping I hit the right page.
+The numbers mean things!
+
+Manpages are split into "sections", each of which contain a series of pages on all the useful
+things your boxen can do.
+
+There's a list of all the sections you can get to, available at `man man`. 
+Once you find a section that seems relevant, there's *this* lovely thing: 
+`man -k .` 
+
+It gets you all the pages in all the sections you've got, in a horrible, unsorted list,
+and you can filter them down with `grep`.
+
+If you want to see what's in section 8, on my machine, System administration commands, this
+will filter the list down for you:
+`man -k . | grep -F '(8)' | less`
+
+`less` lets you page through it, and read all the lovely 1-liner summaries for your pages. 
+
+
+## Tracing for Plebs
+
+You've got some *amazing* tools at your fingertips that you may never have used!
+Allow me to introduce you to `strace`, `ltrace`, and `ldd`, some of my best friends when trying to
+figure out what's going on in some hairy undocumented GNU-code.
+
+`ltrace` will dump all the calls made to shared libraries, along with their arguments.
+On Linux *most* of the time you're running a dynamic binary, linking against a shared libc.
+What that means, is that you can get track and print many of the calls made to libc as your program runs,
+allowing you to figure out where it allocates, what files it opens, and a few other lovely things.
+
+I've used `ltrace` to dump all of the functions that gdb calls on runtime to help break down how it finds
+debug symbols on a modern system, where debug information and the libraries themselves are split.
+
+Ready for some *real* magic?
+```
+ltrace -o dump gdb ./a.out
+awk -F"(" '{print $1}' < dump > dump2
+sort dump2 | uniq -c | sort -n
+```
+
+Here we've asked gdb to trace something, and dumped every library call it made,
+chopped the output to only function names, sorted them alphabetically and counted them,
+and then sorted them numerically
+
+Gives us an amazing picture of why gdb boots so darn slow. Just a few of gdb's favorite calls
+before it throws the user a prompt:
+```
+ 120200 strcmp
+  97600 strlen
+  79968 memcmp
+  25217 memcpy
+  15063 malloc
+   4785 strstr
+   4200 strncmp
+   3253 strcasecmp
+```
+
+`strace` is another *awesome* tool, giving you deep introspection into syscalls your program uses.
+If you're one of the lucky few able to make/ship static binaries, or if your compiler just likes to inline
+all the things, `ltrace` might not catch everything important.
+
+Want to know what your dynamic linker does when it boots your program?
+Want to know how gdb stops the kernel from randomizing your program's address space, to make debugging more consistent?
+`strace` is here to save the day! There's some handy stuff in there!
+
+Just call it with `strace -o dump <my_program>` and you'll get quite a list
+
+strace uses the ptrace syscall tracer, `ptrace(PTRACE_SYSCALL, ...)` under the hood, and you can write your own
+tools the same way.
+
+`ldd` is pretty simple, it tells you all the dynamic libraries that a program will load to run.
+Hello World on my machine pulls in:
+```
+linux-vdso.so.1
+libc.so.6
+/lib64/ld-linux-x86-64.so.2
+```
+Linux uses the VDSO to provide virtual syscalls like `gettimeofday`, without jumping to the kernel  
+`ld-linux-x86-64` is the dynamic linker this program needed, to load and run  
+`libc` is where things like `printf`, `malloc`, and `free` live  
+
+
+## Where's My Missing Sock?
+
+Ever been stuck trying to find a header file you *know* lives somewhere on your system?
+Just want to read the definitions for the things you're pulling in?
+Can't remember the atrocious syntax for `find`? Try `locate`!
+`locate` indexes your drive so it can give you results very quickly, and searches by filename
+
+Want to find `unistd.h`? `locate unistd.h` has you covered.
+
+
+## ELF: How Things Do The Things
+
+ELF is the object file format on Linux. It is used for both executables and libraries, and there are handy tools
+for digging into both
+
+`objdump` is a little niche, but for certain types of problems, it's a lifesaver.
+`objdump -d -M intel <my_binary>` will dump out the assembly for you, useful for spot-checking compiled code 
+(and with intel syntax, to boot)
+`objdump -x <my_binary>` will print all the sections in your binary, and you can see symbols just a little further down,
+handy for double-checking that you exported your functions correctly for your library.
+
+`readelf` covers a lot of the same ground, but formats the information a little differently, 
+occasionally I'll use it as an alternative to `objdump` to get a new angle on the data 
+when writing binary generation tools.
+
+If you're ready to ship, `strip` can slim down your ELF files a little.
+`strip --strip-unneeded` can pull out symbols that you don't actually use, often making your binary much much smaller
