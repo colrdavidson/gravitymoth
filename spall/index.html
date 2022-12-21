@@ -63,7 +63,7 @@
 					<figcaption>spall loading a 200 MB trace file, and getting stats for a minute of program runtime</figcaption>
 				</figure>
 
-				<h3>Live Demo</h3>
+				<h3 id="live-demo">Live Demo</h3>
 				<p>spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
 				going head-to-head against perfetto, and handily won, with buttery smooth frames and tiny load-times for huge files!</p>
 				<div class="video-frame">
@@ -97,7 +97,7 @@
 					<a href="/spall/spall.html">Start spall</a>
 				</div>
 
-				<h3>For Everybody Else</h3>
+				<h3 id="spall-walkthrough">For Everybody Else</h3>
 				<p>If you want to learn to use spall and get a quick briefer on profilers, keep reading!</p>
 
 				<p>Profilers <i>typically</i> come in two flavors, <b>sampling</b> and <b>tracing</b>. spall is a frontend with support
@@ -120,7 +120,7 @@
 				<p>If you want to sample and you're on a platform with <code>dtrace</code> support, there's a lovely community supported library, 
 				<a href="https://github.com/bvisness/dtrace2spall">dtrace2spall</a>, that you can use to get started without changing your code.</p>
 
-				<h3>Basic Features</h3>
+				<h3 id="basic-features">Basic Features</h3>
 
 				<p>Once you've got your program instrumented, you can drag-and-drop
 				or click "open file" at the top left, and select your <code>spall</code> or <code>json</code> file, and get started.</p>
@@ -164,13 +164,35 @@
 					<a href="/spall/spall.html">Start spall</a>
 				</div>
 
-				<h3>Extra Goodies</h3>
+				<h3 id="extra-goodies">Extra Goodies</h3>
 				<p>The web-version of spall is available on <a href="https://github.com/colrdavidson/spall">github</a> if you want to go play 
 				with the source yourself!</p>
 				<div class="info">
 					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
 					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
 				</div>
+			</section>
+			<section id="sidebar">
+				<ul>
+					<a class="slug-entry" href="#spall-walkthrough">
+						<li>
+							<p>Walkthrough</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#basic-features">
+						<li>
+							<p>Basic Features</p>
+						</li>
+					</a>
+					<a class="slug-entry special" href="/spall/spall.html">
+						<li>
+							<p>
+								<i class="fa fa-external-link literally-me"></i>
+								Start Spall
+							</p>
+						</li>
+					</a>
+				</ul>
 			</section>
 		</div>
 	</body>

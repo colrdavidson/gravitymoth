@@ -258,6 +258,21 @@ nav {
 	margin: 0;
 	padding: 0;
 }
+.slug-entry.special {
+	color: var(--nav-font-color);
+	background-color: var(--nav-color);
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+.slug-entry.special:hover {
+	background-color: var(--nav-color);
+}
+.literally-me {
+	margin-right: auto;
+}
+
 
 .content-highlight > h1 {
 	margin-bottom: 0.5em;
