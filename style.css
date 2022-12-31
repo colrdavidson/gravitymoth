@@ -39,6 +39,15 @@
 	}
 }
 
+::moz-section {
+	background: var(--nav-color);
+	color: var(--nav-font-color);
+}
+::section {
+	background: var(--nav-color);
+	color: var(--nav-font-color);
+}
+
 html {
 	scrollbar-gutter: stable;
 }
