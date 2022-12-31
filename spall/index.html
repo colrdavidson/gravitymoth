@@ -27,6 +27,12 @@
 
 		<title>Gravity Moth</title>
 	</head>
+	<script>
+		function load_spall() {
+			let spall_frame = "<iframe class=\"spall-frame\" src=\"/spall/spall.html\"></iframe>";
+			document.getElementById("demo").innerHTML = spall_frame;
+		}
+	</script>
 	<body>
 		<nav>
 			<span class="nav-frame">
@@ -44,7 +50,7 @@
 			<a class="dropdown entry" href="/spall">Spall</a>
 			<a class="dropdown entry" href="/blog">Blog</a>
 		</div>
-		<div class="root">
+		<div class="root spall">
 			<section id="header">
 				<div class="header-line">
 					<h1>spall</h1>
@@ -53,50 +59,48 @@
 				</div>
 				<h5>spall is a profiler, a magnifying glass for performance problems</h5>
 			</section>
-			<section id="content">
-				<figure>
-					<div class="video-wrapper">
-						<video autoplay loop muted playsinline>
-							<source src="../media/recent_spall.mp4" type="video/mp4">
-						</video>
-					</div>
-					<figcaption>spall loading a 200 MB trace file, and getting stats for a minute of program runtime</figcaption>
-				</figure>
-
-				<h3 id="live-demo">Live Demo</h3>
-				<p>spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
-				going head-to-head against perfetto, and handily won, with buttery smooth frames and tiny load-times for huge files!</p>
-				<div class="video-frame">
-					<iframe 
-						title="vimeo-player" 
-						src="https://player.vimeo.com/video/776796857?h=eb79b4ca63"
-						frameborder="0"
-						allowfullscreen>
-					</iframe>
-				</div>
-				<p>Check out more excellent talks and demos like spall over at 
-				<a href="https://guide.handmade-seattle.com/c/2022/">Handmade Seattle's Video Guide</a></p>
-				<div class="info">
-					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
-					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
-				</div>
-
-				<h2>Jumping Right In!</h2>
+			<section id="demo" class="spall-frame-box">
+				<button onclick="load_spall()">Start Spall</button>
 				<div class="warning">
 					<h4>Heads up!</h4>
 					<p>spall isn't very mobile-friendly due to the serious memory and screen constraints most 
 					mobile devices have. If you've got a desktop, you should use that instead!</p>
 				</div>
-
-
+			</section>
+			<section id="underbar">
+				<div class="info">
+					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
+					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
+				</div>
+			</section>
+			<section id="sidebar">
+				<ul>
+					<a class="slug-entry" href="#spall-walkthrough">
+						<li>
+							<p>Walkthrough</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#basic-features">
+						<li>
+							<p>Basic Features</p>
+						</li>
+					</a>
+					<a class="slug-entry special" href="/spall/spall.html">
+						<li>
+							<p>
+								<i class="fa fa-external-link literally-me"></i>
+								Fullscreen Spall
+							</p>
+						</li>
+					</a>
+				</ul>
+			</section>
+			<section id="content">
+				<h2>Jumping Right In!</h2>
 				<h3>For Web-Profiler Vets</h3>
 				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
 				spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
 				off and running with your existing files and JSON trace dumping code. If you use chrome's sampling profiler for bigger captures and you're struggling to view them, spall can ingest and display those files too!</p>
-				<div class="spall-link">
-					<a href="/spall/spall.html">Start spall</a>
-				</div>
-
 				<h3 id="spall-walkthrough">For Everybody Else</h3>
 				<p>If you want to learn to use spall and get a quick briefer on profilers, keep reading!</p>
 
@@ -160,39 +164,24 @@
 				<h4>That's All!</h4>
 				<p>You've got the basics at this point, go have fun!</p>
 
-				<div class="spall-link">
-					<a href="/spall/spall.html">Start spall</a>
-				</div>
-
 				<h3 id="extra-goodies">Extra Goodies</h3>
-				<p>The web-version of spall is available on <a href="https://github.com/colrdavidson/spall">github</a> if you want to go play 
-				with the source yourself!</p>
+				<p>spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
+				going head-to-head against perfetto, and handily won, with buttery smooth frames and tiny load-times for huge files!</p>
+				<div class="video-frame">
+					<iframe 
+						title="vimeo-player" 
+						src="https://player.vimeo.com/video/776796857?h=eb79b4ca63"
+						frameborder="0"
+						allowfullscreen>
+					</iframe>
+				</div>
+				<p>Check out more excellent talks and demos like spall over at 
+				<a href="https://guide.handmade-seattle.com/c/2022/">Handmade Seattle's Video Guide</a></p>
+				<p>The web-version of spall is available on <a href="https://github.com/colrdavidson/spall">github</a> if you want to go play with the source yourself!</p>
 				<div class="info">
 					<p>Do you like spall? Are you looking to hire a senior systems engineer?</p><p>Check out the rest of my
 					<a href="https://colrdavidson.github.io">portfolio</a> for more cool projects and contact info!</p>
 				</div>
-			</section>
-			<section id="sidebar">
-				<ul>
-					<a class="slug-entry" href="#spall-walkthrough">
-						<li>
-							<p>Walkthrough</p>
-						</li>
-					</a>
-					<a class="slug-entry" href="#basic-features">
-						<li>
-							<p>Basic Features</p>
-						</li>
-					</a>
-					<a class="slug-entry special" href="/spall/spall.html">
-						<li>
-							<p>
-								<i class="fa fa-external-link literally-me"></i>
-								Start Spall
-							</p>
-						</li>
-					</a>
-				</ul>
 			</section>
 		</div>
 	</body>
