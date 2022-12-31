@@ -4,6 +4,7 @@
 	--light-nav-color:  #9FD1E4;
 	--light-nav-color2: #DFF0F6;
 	--off-color:        #EFEFEF;
+	--nav-off-color:    #4CA8CC;
 	--link-color:       #0083B7;
 
 	--font-color:           #222222;
@@ -23,6 +24,7 @@
 		--light-nav-color:  #003145;
 		--light-nav-color2: #00425B;
 		--off-color:        #333333;
+		--nav-off-color:    #4CA8CC;
 		--link-color:       #0083B7;
 
 		--font-color:           #bebebe;
@@ -177,6 +179,9 @@ nav {
 	padding: 0.75em;
 	background-color: var(--nav-color);
 	color: var(--nav-font-color);
+}
+.button-box > button:hover {
+	background-color: var(--nav-off-color);
 }
 
 .button-box > .manual {
@@ -344,15 +349,23 @@ nav {
 	justify-content: center;
 }
 .slug-entry.special:hover {
-	background-color: var(--nav-color);
+	background-color: var(--nav-off-color);
 	cursor: pointer;
 }
 .slug-entry.special.invisible {
 	display: none;
 }
 
+.button-dumb {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
 .literally-me {
-	margin-right: auto;
+	font-size: 16pt;
+	font-style: normal;
+	margin-right: 0.25em;
 }
 
 

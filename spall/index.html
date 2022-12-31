@@ -70,7 +70,7 @@
 			<section id="demo" class="spall-frame-box">
 				<div class="button-box">
 					<button onclick="load_spall()">Start Spall</button>
-					<button class="manual" onclick="load_manual()"><i class="fa fa-external-link"></i></button>
+					<button class="manual" onclick="load_manual()" title="Open Spall in a New Tab"><i class="fa fa-external-link"></i></button>
 				</div>
 				<div class="warning">
 					<h4>Heads up!</h4>
@@ -88,8 +88,8 @@
 				<ul>
 					<a id="fullscreen-button" class="slug-entry special invisible" onclick="set_fullscreen()">
 						<li>
-							<p>
-								<i class="fa fa-external-link literally-me"></i>
+							<p class="button-dumb">
+								<i class="literally-me">&#9974;</i>
 								Fullscreen Spall
 							</p>
 						</li>
@@ -112,6 +112,14 @@
 					<a class="slug-entry" href="#extra-goodies">
 						<li>
 							<p>Extra Goodies</p>
+						</li>
+					</a>
+					<a class="slug-entry special" onclick="load_manual()">
+						<li>
+							<p class="button-dumb">
+								<i class="literally-me fa fa-external-link"></i>
+								Spall in a New Tab
+							</p>
 						</li>
 					</a>
 				</ul>
