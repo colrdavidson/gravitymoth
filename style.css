@@ -127,7 +127,7 @@ nav {
 
 .root {
 	display: grid;
-	gap: 1em;
+	gap: 0.75em;
 	grid-template-columns: 1fr 15em;
 	grid-template-rows: auto 1fr auto;
 
@@ -201,7 +201,7 @@ nav {
 #header {
 	grid-row: 1;
 	grid-column: 1/2;
-	margin-top: 2.5em;
+	margin-top: 1.5em;
 	margin-bottom: 0em;
 }
 
@@ -674,6 +674,7 @@ p > img {
 }
 
 .warning > p {
+	text-align: center;
 	margin: 0;
 	padding: 0;
 }
