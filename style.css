@@ -178,7 +178,6 @@ nav {
 #underbar {
 	grid-row: 3;
 	grid-column: span 2;
-	margin-bottom: 1em;
 }
 
 #demo {
@@ -269,6 +268,11 @@ nav {
 }
 
 #sidebar > ul {
+	align-self: start;
+	position: sticky;
+	top: 1em;
+	width: 100%;
+
 	margin: 0;
 	padding: 0;
 
