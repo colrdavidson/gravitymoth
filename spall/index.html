@@ -31,6 +31,7 @@
 		function load_spall() {
 			let spall_frame = "<iframe class=\"spall-frame\" src=\"/spall/spall.html\" id=\"spall\" allowfullscreen></iframe>";
 			document.getElementById("demo").innerHTML = spall_frame;
+			document.getElementById("fullscreen-button").classList.remove("invisible");
 		}
 
 		function set_fullscreen() {
@@ -79,7 +80,7 @@
 			</section>
 			<section id="sidebar">
 				<ul>
-					<a class="slug-entry special" onclick="set_fullscreen()">
+					<a id="fullscreen-button" class="slug-entry special invisible" onclick="set_fullscreen()">
 						<li>
 							<p>
 								<i class="fa fa-external-link literally-me"></i>
@@ -87,7 +88,7 @@
 							</p>
 						</li>
 					</a>
-					<a class="slug-entry" href="#header">
+					<a class="slug-entry" href="#">
 						<li>
 							<p>Spall Demo</p>
 						</li>

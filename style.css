@@ -334,6 +334,10 @@ nav {
 	background-color: var(--nav-color);
 	cursor: pointer;
 }
+.slug-entry.special.invisible {
+	display: none;
+}
+
 .literally-me {
 	margin-right: auto;
 }
