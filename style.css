@@ -159,16 +159,29 @@ nav {
 	align-items: center;
 }
 
-.spall-frame-box > button {
+.spall-frame-box > .button-box {
+	display: flex;
+	flex-direction: row;
+	width: 10.5em;
+	justify-content: space-between;
+
+	margin-top: 19.5em;
+	margin-bottom: 2em;
+}
+
+.button-box > button {
 	font-size: 14pt;
 	cursor: pointer;
+	border: none;
 	border-radius: 5px;
 	padding: 0.75em;
 	background-color: var(--nav-color);
 	color: var(--nav-font-color);
+}
 
-	margin-top: 19em;
-	margin-bottom: 2em;
+.button-box > .manual {
+	width: 2.75em;
+	height: 2.75em;
 }
 
 .spall-frame {

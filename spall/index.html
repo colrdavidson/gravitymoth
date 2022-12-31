@@ -33,6 +33,10 @@
 			document.getElementById("demo").innerHTML = spall_frame;
 			document.getElementById("fullscreen-button").classList.remove("invisible");
 		}
+		function load_manual() {
+			document.getElementById("demo").style = "display: none";
+			window.open("spall.html", '_blank');
+		}
 
 		function set_fullscreen() {
 			document.getElementById("spall").requestFullscreen();
@@ -65,7 +69,10 @@
 				<h5>spall is a profiler, a magnifying glass for performance problems</h5>
 			</section>
 			<section id="demo" class="spall-frame-box">
-				<button onclick="load_spall()">Start Spall</button>
+				<div class="button-box">
+					<button onclick="load_spall()">Start Spall</button>
+					<button class="manual" onclick="load_manual()"><i class="fa fa-external-link"></i></button>
+				</div>
 				<div class="warning">
 					<h4>Heads up!</h4>
 					<p>spall isn't very mobile-friendly due to the serious memory and screen constraints most 
