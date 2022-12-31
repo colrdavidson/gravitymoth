@@ -1,37 +1,39 @@
 :root {
-	--bg-color:    #FFFFFF;
-	--nav-color:   #0083B7;
-	--light-nav-color:   #9FD1E4;
-	--light-nav-color2:  #DFF0F6;
-	--off-color:   #EFEFEF;
-	--link-color:  #0083B7;
+	--bg-color:         #FFFFFF;
+	--nav-color:        #0083B7;
+	--light-nav-color:  #9FD1E4;
+	--light-nav-color2: #DFF0F6;
+	--off-color:        #EFEFEF;
+	--link-color:       #0083B7;
 
-	--font-color:  #222222;
-	--font-dark-color:  #222222;
-	--nav-light-font-color:  var(--font-color);
-	--nav-font-color:  whitesmoke;
+	--font-color:           #222222;
+	--iframe-border-color:  lightgrey;
+	--font-dark-color:      #222222;
+	--nav-light-font-color: var(--font-color);
+	--nav-font-color:       whitesmoke;
 
-	--logo-bg:     #002B36;
-	--shadow-color: rgba(0, 0, 0, 0.1);
+	--logo-bg:              #002B36;
+	--shadow-color:         rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--bg-color:    #181A1B;
-		--nav-color:   #0083B7;
+		--bg-color:         #181A1B;
+		--nav-color:        #0083B7;
 		--light-nav-color:  #003145;
 		--light-nav-color2: #00425B;
-		--off-color:   #333333;
-		--link-color:  #0083B7;
+		--off-color:        #333333;
+		--link-color:       #0083B7;
 
-		--font-color:  #bebebe;
-		--font-dark-color:  #222222;
-		--nav-light-font-color:  var(--font-color);
-		--nav-font-color:  whitesmoke;
+		--font-color:           #bebebe;
+		--iframe-border-color:  black;
+		--font-dark-color:      #222222;
+		--nav-light-font-color: var(--font-color);
+		--nav-font-color:       whitesmoke;
 
-		--logo-bg:     #002B36;
+		--logo-bg:              #002B36;
 
-		--shadow-color: rgba(0, 0, 0, 0.8);
+		--shadow-color:         rgba(0, 0, 0, 0.8);
 	}
 }
 
@@ -172,7 +174,7 @@ nav {
 .spall-frame {
 	height: 100%;
 	width: 100%;
-	border: 1px solid lightgrey;
+	border: 1px solid var(--iframe-border-color);
 }
 
 #underbar {
@@ -202,7 +204,7 @@ nav {
 	grid-row: 1;
 	grid-column: 1/2;
 	margin-top: 1.5em;
-	margin-bottom: 0em;
+	margin-bottom: -0.5em;
 }
 
 .header-line {
@@ -330,6 +332,7 @@ nav {
 }
 .slug-entry.special:hover {
 	background-color: var(--nav-color);
+	cursor: pointer;
 }
 .literally-me {
 	margin-right: auto;
