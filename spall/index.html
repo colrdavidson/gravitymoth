@@ -129,7 +129,8 @@
 				<h3>For Web-Profiler Vets</h3>
 				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
 				spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
-				off and running with your existing files and JSON trace dumping code. If you use chrome's sampling profiler for bigger captures and you're struggling to view them, spall can ingest and display those files too!</p>
+				off and running with your existing files and JSON trace dumping code. If you use chrome's sampling profiler for bigger captures and 
+				you're struggling to view them, spall can ingest and display those files too!</p>
 				<h3 id="spall-walkthrough">For Everybody Else</h3>
 				<p>If you want to learn to use spall and get a quick briefer on profilers, keep reading!</p>
 
@@ -138,14 +139,17 @@
 				and written to a file. Sampling, where the profiler takes a snapshot of your program on an interval, can be a little easier to 
 				configure but can miss shorter-lived functions completely, and provides very little data for programs with short runtimes.</p>
 
-				<p>The common advice for profilers is to sample first, and then trace sparingly to narrow in on the problem,
-				but if your traces are cheap enough (spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
-				when configured correctly), you can often skip right to tracing and get far more useful data.</p>
-
 				<p>spall includes a <a href="https://github.com/colrdavidson/spall/blob/master/spall.h">small, single-header C library</a>,
 				to make tracing easy. For relatively simple programs using clang or gcc, you can use <code>-finstrument-functions</code>
-				to instrument your whole program quickly. For more complex programs, you manually instrument specific parts of your code 
-				to reduce your trace sizes and keep your runtimes a little more accurate.</p>
+				to instrument your whole program quickly. For more complex programs, you might want to manually instrument specific 
+				parts of your code to reduce your trace sizes and keep your runtimes a little more accurate.</p>
+
+				<p>The common advice for profilers is to sample first, and then trace sparingly to narrow in on the problem,
+				but if your traces are cheap enough (spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
+				when configured correctly), with auto-tracing you can often skip right to tracing and get far more useful data. 
+				Hopefully spall's native version will be shippable soon, so you'll be able to trace bigger programs happily.
+				With the native version prototype as-is, spall can push at least 8 million functions per second, tracing all
+				of the Odin compiler's 100 million function-calls that get run while compiling spall itself.</p>
 
 				<p>There are some very simple <a href="https://github.com/colrdavidson/spall/blob/master/examples/">examples</a> to get
 				started with tracing! (If you can't bind against the C header in your project, don't worry, more language support is planned soon!)</p>
