@@ -148,7 +148,8 @@
 				but if your traces are cheap enough (spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
 				when configured correctly), with auto-tracing you can often skip right to tracing and get far more useful data. 
 				Hopefully spall's native version will be shippable soon, so you'll be able to trace bigger programs happily.
-				With the native version prototype as-is, spall can push at least 8 million functions per second, tracing all
+				With the native version prototype as-is, along with `-finstrument-functions` instrumentation,
+				spall's library can push and display least 8 million functions per second, tracing all
 				of the Odin compiler's 100 million function-calls that get run while compiling spall itself.</p>
 
 				<p>There are some very simple <a href="https://github.com/colrdavidson/spall/blob/master/examples/">examples</a> to get
