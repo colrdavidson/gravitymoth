@@ -39,6 +39,11 @@
 	}
 }
 
+section:not(#demo) {
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
 ::moz-section {
 	background: var(--nav-color);
 	color: var(--nav-font-color);
@@ -207,6 +212,7 @@ nav {
 #underbar {
 	grid-row: 3;
 	grid-column: span 2;
+	margin-bottom: 0.5em;
 }
 
 #demo {
@@ -701,6 +707,20 @@ p > img {
 	margin-bottom: 1em;
 
 	max-width: 38.5em;
+}
+
+.short-notes-box {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: space-between;
+	gap: 1em;
+
+	margin-bottom: 0.5em;
+}
+
+.short-notes-box > .video-wrapper {
+	max-width: 25em;
 }
 
 .info {
