@@ -694,9 +694,9 @@ p > img {
 	align-items: center;
 
 	padding: 0.5em;
-	background-color: pink;
+	background-color: palegoldenrod;
 	color: var(--font-dark-color);
-	border: 1px solid red;
+	border: 1px solid orange;
 	border-radius: 10px;
 	margin-bottom: 1em;
 
