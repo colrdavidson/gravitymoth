@@ -183,12 +183,12 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 <li><strong>Workers can only push tasks on to their own queues</strong>
 
 <ul>
-<li>No work can sneak into their queues, so all work always gets completed</li>
+<li>Threads are always accurately aware of how many tasks are left in their own queues, so all work always gets completed</li>
 </ul></li>
 <li><strong>Every worker but main is allowed to steal from any other thread&rsquo;s queue</strong>
 
 <ul>
-<li>Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack</li>
+<li>This simplifies the code and you can get proper full-core performance by spinning up N+1 threads, so that every core has a thread that can steal</li>
 </ul></li>
 <li><strong>The worker doing the last task in the pool <em>must</em> try to wake main</strong>
 
@@ -198,7 +198,7 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 <li><strong>Any time new work gets added to any queue, threads get a wake-up signal</strong>
 
 <ul>
-<li>This notifies sleeping threads that &ldquo;hey, you&rsquo;ve got potential work to steal!&rdquo;</li>
+<li>This lets sleeping threads know that &ldquo;hey, you might have work to steal!&rdquo;</li>
 </ul></li>
 </ul>
 
