@@ -131,8 +131,8 @@ If your lock is wrapped around a *very* cheap operation, a spin-lock that turns 
 ## Fancy Tricks with Race Conditions
 
 I used futexes in a work-stealing threadpool I wrote for the [Odin](https://github.com/odin-lang/Odin) compiler, to help it scale better for many-core machines.
-In that code, I use a futex to track the number of tasks left in the total pool. To make it work properly, I make use of a race condition, trading a *little*
-bit of efficiency in an edge-case for much faster general throughput. Because I know how the system is going to distribute work, I was able to place a few constraints on the system.
+In that code, I use a futex to track the number of tasks left in the total pool. To make it work properly, I leverage a race condition, trading a *little*
+bit of efficiency in an edge-case for much faster general throughput. Because I know how the system runs and distributes work, I used a few constraints to keep things zippy.
 
 [Threadpool code to dig through](https://github.com/colrdavidson/workpool/blob/main/pool.h#L313)
 
