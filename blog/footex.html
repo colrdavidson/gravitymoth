@@ -75,7 +75,7 @@ return
 </code></pre>
 
 <p>In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you&rsquo;re expecting.
-For this example however, we&rsquo;ll pretend <code>futex_wait</code> handles that for us.</p>
+For these examples however, we&rsquo;ll pretend <code>futex_wait</code> handles that for us.</p>
 
 <p><code>futex_broadcast(a)</code> wakes up all the threads sleeping on address a.</p>
 
