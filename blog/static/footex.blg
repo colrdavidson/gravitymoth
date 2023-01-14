@@ -22,7 +22,7 @@ We'll get into it with some examples.
 We're going to use C11 atomics in x86-land, because they keep things on the dev-side *relatively* simple.
 
 ### Ready to Go? Futex Flags
-Let's start with something simple, a ready condition!
+Let's start with a ready flag!
 These can be handy for making threads wait after start up, so that main has some time to pass them all things to do.
 
 In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you're expecting.
