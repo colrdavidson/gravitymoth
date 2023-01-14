@@ -48,7 +48,7 @@ I&rsquo;ll start by defining terms for this article, to help keep things straigh
 If you use pthreads, you might use a <code>pthread_mutex</code>, or for MSVC, a <code>CriticalSection</code> can be used to cover the same need.</p>
 
 <p><strong>Condition Variables</strong> are used for data signalling with locking, often used for managing thread pools. All threadpool workers might
-sleep on a condition variable, and when work is pushed the workers can be woken up sequentially, owning an exclusive lock to grab
+sleep on a condition variable, and when work is pushed the workers can be woken up sequentially, getting an exclusive lock to grab
 a task from the pool.</p>
 
 <p>So, what&rsquo;s a <strong>Futex</strong> then? Futexes are a very handy thread primitive, provided by most major kernels (Windows, Linux, OSX, BSDs).
