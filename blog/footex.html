@@ -183,7 +183,7 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 <li><strong>Workers can only push tasks on to their own queues</strong>
 
 <ul>
-<li>Threads are always accurately aware of how many tasks are left in their own queues, so all work always gets completed</li>
+<li>Threads never have unexpected work show up in their own queues, so all work always gets completed</li>
 </ul></li>
 <li><strong>Every worker but main is allowed to steal from any other thread&rsquo;s queue</strong>
 
