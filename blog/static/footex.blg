@@ -138,7 +138,7 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 - **Main must participate in the work**
 	+ When debugging, it's much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don't need to spin up any threads
 - **Workers can only push tasks on to their own queues**
-	+ Threads are always accurately aware of how many tasks are left in their own queues, so all work always gets completed
+	+ Threads never have unexpected work show up in their own queues, so all work always gets completed
 - **Every worker but main is allowed to steal from any other thread's queue**
 	+ This simplifies the code and you can get proper full-core performance by spinning up N+1 threads, so that every core has a thread that can steal
 - **The worker doing the last task in the pool *must* try to wake main**
