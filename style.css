@@ -39,7 +39,7 @@
 	}
 }
 
-section:not(#demo) {
+section:not(#demo):not(#sidebar) {
 	padding-left: 1em;
 	padding-right: 1em;
 }
