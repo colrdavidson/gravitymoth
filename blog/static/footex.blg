@@ -135,11 +135,16 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 
 [Threadpool code to dig through](https://github.com/colrdavidson/workpool/blob/main/pool.h#L313)
 
-- Main must participate in the work -- When debugging, it's much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don't need to spin up any threads
-- Workers can only push tasks on to their own queues -- No work can sneak into their queues, so all work always gets completed
-- Every worker but main is allowed to steal from any other thread's queue -- Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack
-- The worker doing the last task in the pool *must* try to wake main -- If main doesn't do the last task, or if the thread with the last task doesn't wake main, your program will never finish
-- Any time new work gets added to any queue, threads get a wake-up signal -- This notifies sleeping threads that "hey, you've got potential work to steal!"
+- **Main must participate in the work**
+	+ When debugging, it's much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don't need to spin up any threads
+- **Workers can only push tasks on to their own queues**
+	+ No work can sneak into their queues, so all work always gets completed
+- **Every worker but main is allowed to steal from any other thread's queue**
+	+ Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack
+- **The worker doing the last task in the pool *must* try to wake main**
+	+ If main doesn't do the last task, or if the thread with the last task doesn't wake main, your program will never finish
+- **Any time new work gets added to any queue, threads get a wake-up signal**
+	+ This notifies sleeping threads that "hey, you've got potential work to steal!"
 
 Spot the race condition in the code? It's a little tricky! There's no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks, and done stealing,
 but not yet asleep when the signal comes in, they *may* go to sleep when they *could* have stolen a task. That only happens when there's not quite enough work to do though, so it's a little loss
