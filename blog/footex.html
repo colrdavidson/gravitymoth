@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<meta property="og:type"  content="article" /><meta property="og:url" content="https://gravitymoth.com/blog/footex" /><meta property="og:description" content="How I Learned to Stop Locking and Love the Race Condition" /><meta property="og:title" content="Futexes and You" /><meta property="twitter:title" content="Futexes and You" /><meta property="og:image" content="https://gravitymoth.com/media/logo_bg.png" /><meta property="og:locale" content="en_US"><meta property="og:site_name" content="Gravity Moth"><meta property="twitter:card" content="summary">
+
+		<link rel="stylesheet" href="../style.css" />
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="header"><h1>Futexes and You</h1><h5>Fri, 13 Jan 2023</h5><div class="link-row"><a class="older-link" href="missinglinux1.html">Older<i class="fa fa-arrow-right"/></i></a></div></section>
+			<section id="content"><p>So, first things first, threading is <em>tricky</em>, and we don&rsquo;t make it easy for devs trying to learn.
+There&rsquo;s a ton of names floating around for thread-primitives, many of which are confusing.
+I&rsquo;ll start by defining terms for this article, to help keep things straight.</p>
+
+<h2>Defining Terms</h2>
+
+<p>Mutexes (Locks) are a way to ensure only <em>one</em> thread can run some section of code, or touch some resource for a period of time.
+If you use pthreads, you might use a <code>pthread_mutex</code>, or for MSVC, a <code>CriticalSection</code> can be used to cover the same need.</p>
+
+<p>Semaphores are like mutexes, except they count. You can set a maximum number of threads in a section at a time.</p>
+
+<p>Condition variables are used for data signalling with locking, often used for managing thread pools. All threadpool workers might
+sleep on a condition variable, and when work is pushed the workers can be woken up sequentially, owning an exclusive lock to grab
+a task from the pool.</p>
+
+<p>Read-Write Mutexes are mutexes with a little more fine-grained access control. Typically, they&rsquo;re used to allow many readers into a section, and
+then lock more firmly (ensuring there are no readers still in the section) when a write needs to happen.</p>
+
+<p>So, what&rsquo;s a <code>futex</code> then? Futexes are a very handy thread primitive, provided by most major kernels (Windows, Linux, OSX, BSDs).
+We&rsquo;ll get into it with some examples.</p>
+
+<h2>Futexes For Great Good</h2>
+
+<p>We&rsquo;re going to use C11 atomics in x86-land, because they keep things on the dev-side <em>relatively</em> simple.</p>
+
+<h3>Ready to Go? Futex Flags</h3>
+
+<p>Let&rsquo;s start with something simple, a ready condition!
+These can be handy for making threads wait after start up, so that main has some time to pass them all things to do.</p>
+
+<p>In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you&rsquo;re expecting.
+For this example however, we&rsquo;ll pretend <code>futex_wait</code> handles that for us.</p>
+
+<p><code>futex_wait(a, b)</code> is a &ldquo;mr.kernel, check my assumption please&rdquo; tool. The kernel will wake you up immediately if a != b, otherwise it will put you to sleep.
+`futex_broadcast(a) wakes up all the threads sleeping on address a.</p>
+
+<p>Here&rsquo;s a simple example:</p>
+
+<pre><code>void *thread_worker(void *args) {
+	int32_t *ready = (int32_t *)args;
+
+	printf(&quot;Checking to see if main is ready yet\n&quot;);
+	futex_wait(ready, 0);
+
+	printf(&quot;Doing thread things now!\n&quot;);
+	for (int i = 0; i &lt; 5; i++) {
+		printf(&quot;thread-work %d\n&quot;, i);
+	}
+
+	return NULL;
+}
+
+int main(int argc, char **argv) {
+	_Atomic int32_t ready = 0;
+
+	// Spin up all the threads first
+	Thread t1, t2, t3;
+	t1 = thread_create(thread_worker, &amp;ready);
+	t2 = thread_create(thread_worker, &amp;ready);
+	t3 = thread_create(thread_worker, &amp;ready);
+
+	printf(&quot;Doing fake work in main to prepare!\n&quot;);
+	for (int i = 0; i &lt; 10; i++) {
+		printf(&quot;pre-work %d\n&quot;, i);
+	}
+
+	// Ok, we're ready to go!
+	ready++;
+	futex_broadcast(&amp;ready);
+
+	thread_end(t1);
+	thread_end(t2);
+	thread_end(t3);
+
+	return 0;
+}
+</code></pre>
+
+<p>Typically, you&rsquo;d use a condition variable / conditional wait for this, but due to the way that API is
+designed, it&rsquo;s not particularly efficient. You don&rsquo;t want to have to manage an unused mutex with your condition, all you really want is a wait condition and a trigger.</p>
+
+<h3>Futex-Mutex: Lock it Down</h3>
+
+<p>On to the next fun exercise, building a lock!
+Locks are built out of two new important parts: <code>atomic_compare_exchange_strong</code> and <code>futex_signal</code>.</p>
+
+<p><code>atomic_compare_exchange_strong(a, b, c)</code> attempts to atomically swap a with c, if a == b. By swapping in <code>lock</code>, or <code>unlock</code>, you ensure only that one thread can grab or release the lock at a time. (this is sometimes referred to as compare-and-swap)
+(on x86, it compiles down to <code>cmpxchg</code> with the <code>lock</code> prefix)</p>
+
+<p><code>futex_signal(a)</code> wakes up only 1 thread sleeping on the lock (a).</p>
+
+<p>Meat and potatoes time:</p>
+
+<pre><code>typedef _Atomic int32_t Mutex;
+
+void mutex_lock(Mutex *lock) {
+	int32_t locked   = 1;
+	int32_t unlocked = 0;
+
+	for (;;) {
+		bool ok = atomic_compare_exchange_strong(lock, &amp;unlocked, locked);
+		if (ok) {
+			return;
+		}
+
+		futex_wait(lock, locked);
+	}
+}
+
+void mutex_unlock(Mutex *lock) {
+	int32_t locked   = 1;
+	int32_t unlocked = 0;
+
+	bool ok = atomic_compare_exchange_strong(lock, &amp;locked, unlocked);
+	if (!ok) {
+		printf(&quot;Double unlock?\n&quot;);
+		exit(1);
+	}
+
+	futex_signal(lock);
+}
+
+</code></pre>
+
+<p>Lock-building strategies vary wildly depending on workload, you don&rsquo;t always want to hop right into the futex <em>right</em> after a failed compare-and-swap. If your lock is wrapped around a <em>very</em> cheap operation, a spin-lock that turns into a futex-lock after a few tries can give you a big win.
+(A spin-lock runs the compare-and-swap in a while-loop, trying over and over again to grab the lock)</p>
+
+<h2>References</h2>
+
+<p>Ok, now for a pile of papers and cool things using them.</p>
+
+<ul>
+<li>Initial work from the <a href="https://www.kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf">2002 Ottawa Linux Symposium</a></li>
+<li>For <em>recursive</em> mutexes and optimization, Ulrich talks about tricky bugs in his <a href="https://www.akkadia.org/drepper/futex.pdf">paper</a></li>
+<li>I wrote a work-stealing threadpool for the <a href="https://github.com/odin-lang/Odin">Odin</a> compiler, available as a <a href="https://github.com/colrdavidson/workpool">tiny C11 library</a></li>
+</ul>
+</section>
+			<section id="sidebar">
+				<ul><a class="slug-entry selected"><li><p>Futexes and You</p></li></a><a class="slug-entry" href="missinglinux1.html"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
+			</section>
+			<section id="nav-footer" class="link-row"><a class="older-link" href="missinglinux1.html">Older<i class="fa fa-arrow-right"/></i></a></section>
+		</div>
+	</body>
+</html>
