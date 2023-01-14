@@ -85,7 +85,8 @@ designed, it's not particularly efficient. You don't want to have to manage an u
 On to the next fun exercise, building a lock!
 Locks are built out of two new important parts: `atomic_compare_exchange_strong` and `futex_signal`.
 
-`atomic_compare_exchange_strong(a, b, c)` attempts to atomically swap a with c, if a == b. By swapping in `locked`(1), or `unlocked`(0), you ensure only that one thread can grab or release the lock at a time. (this is sometimes referred to as compare-and-swap)
+`atomic_compare_exchange_strong(a, b, c)` attempts to atomically swap a with c, if a == b. By swapping in `locked`(1), or `unlocked`(0), you ensure only that one thread can grab or release the lock at a time.
+(this is sometimes referred to as compare-and-swap)
 (on x86, it compiles down to `cmpxchg` with the `lock` prefix)
 
 `futex_signal(a)` wakes up only 1 thread sleeping on the lock (a).
@@ -123,8 +124,28 @@ void mutex_unlock(Mutex *lock) {
 
 ```
 
-Lock-building strategies vary wildly depending on workload, you don't always want to hop right into the futex *right* after a failed compare-and-swap. If your lock is wrapped around a *very* cheap operation, a spin-lock that turns into a futex-lock after a few tries can give you a big win. 
+Lock-building strategies vary wildly depending on workload, you don't always want to hop right into the futex *right* after a failed compare-and-swap.
+If your lock is wrapped around a *very* cheap operation, a spin-lock that turns into a futex-lock after a few tries can give you a big win. 
 (A spin-lock runs the compare-and-swap in a while-loop, trying over and over again to grab the lock)
+
+## Fancy Tricks with Race Conditions
+
+I used futexes in a work-stealing threadpool I wrote for the [Odin](https://github.com/odin-lang/Odin) compiler, to help it scale better for many-core machines.
+In that code, I use a futex to track the number of tasks left in the total pool. To make it work properly, I make use of a race condition, trading a *little*
+bit of efficiency in an edge-case for much faster general throughput. Because I know how the system is going to distribute work, I was able to place a few constraints on the system.
+
+[Threadpool code to dig through](https://github.com/colrdavidson/workpool/blob/main/pool.h#L313)
+
+- Main must participate in the work -- When debugging, it's much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don't need to spin up any threads
+- Workers can only push tasks on to their own queues -- No work can sneak into their queues, so all work always gets completed
+- Every worker but main is allowed to steal from any other thread's queue -- Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack
+- The worker doing the last task in the pool *must* try to wake main -- If main doesn't do the last task, or if the thread with the last task doesn't wake main, your program will never finish
+- Any time new work gets added to any queue, threads get a wake-up signal -- This notifies sleeping threads that "hey, you've got potential work to steal!"
+
+Spot the race condition in the code? It's a little tricky! There's no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks, and done stealing,
+but not yet asleep when the signal comes in, they *may* go to sleep when they *could* have stolen a task. That only happens when there's not quite enough work to do though, so it's a little loss
+in efficiency (work is more serial than it could be), to avoid locking and unlocking every time I check or adjust the remaining task count. In practice for Odin, tasks are typically expensive enough
+and adding new tasks takes long enough that this very rarely occurs. Even with the race all work gets done, it just takes a little longer.
 
 ## References
 
@@ -133,4 +154,3 @@ Ok, now for a pile of papers and cool things using them.
 - Initial work from the [2002 Ottawa Linux Symposium](https://www.kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf)
 - For *recursive* mutexes and optimization, Ulrich talks about tricky bugs in his [paper](https://www.akkadia.org/drepper/futex.pdf)
 - More musing on futexes and drepper's work lives over at [locklessinc](http://locklessinc.com/articles/mutex_cv_futex/)
-- I wrote a work-stealing threadpool for the [Odin](https://github.com/odin-lang/Odin) compiler, available as a [tiny C11 library](https://github.com/colrdavidson/workpool)
