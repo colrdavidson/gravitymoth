@@ -160,7 +160,6 @@ void mutex_unlock(Mutex *lock) {
 
 	futex_signal(lock);
 }
-
 </code></pre>
 
 <p>Lock-building strategies vary wildly depending on workload, you don&rsquo;t always want to hop right into the futex <em>right</em> after a failed compare-and-swap.
