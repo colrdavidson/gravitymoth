@@ -25,13 +25,22 @@ We're going to use C11 atomics in x86-land, because they keep things on the dev-
 Let's start with a ready flag!
 These can be handy for making threads wait after start up, so that main has some time to pass them all things to do.
 
+A few things to know before we get into the code,
+`futex_wait(a, b)` is a "mr.kernel, check my assumptions please" syscall.
+If your assumptions about variable state are correct when the kernel checks, it will put your thread to sleep, ready to be woken by another thread in the future.
+In pseudocode, the kernel does something something vaguely like this.
+```
+if a == b {
+	sleep_until_woken()
+}
+return
+```
 In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you're expecting.
 For this example however, we'll pretend `futex_wait` handles that for us.
 
-`futex_wait(a, b)` is a "mr.kernel, check my assumption please" tool. The kernel will wake you up immediately if a != b, otherwise it will put you to sleep.  
 `futex_broadcast(a)` wakes up all the threads sleeping on address a.
 
-Here's a simple example:
+Ok, here we go:
 ```
 void *thread_worker(void *args) {
 	int32_t *ready = (int32_t *)args;
@@ -72,6 +81,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 ```
+
 Typically, you'd use a condition variable / conditional wait for this, but due to the way that API is
 designed, it's not particularly efficient. You don't want to have to manage an unused mutex with your condition, all you really want is a wait condition and a trigger.
 
@@ -117,6 +127,7 @@ void mutex_unlock(Mutex *lock) {
 	futex_signal(lock);
 }
 ```
+The `futex_wait` in this example makes use of the kernel's atomic assumption check, so that it doesn't get stuck in a sleep if the lock is unlocked between when it tried to lock and went to sleep.
 
 Lock-building strategies vary wildly depending on workload, you don't always want to hop right into the futex *right* after a failed compare-and-swap.
 If your lock is wrapped around a *very* cheap operation, a spin-lock that turns into a futex-lock after a few tries can give you a big win. 
