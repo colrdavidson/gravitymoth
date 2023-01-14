@@ -71,8 +71,8 @@ These can be handy for making threads wait after start up, so that main has some
 <p>In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you&rsquo;re expecting.
 For this example however, we&rsquo;ll pretend <code>futex_wait</code> handles that for us.</p>
 
-<p><code>futex_wait(a, b)</code> is a &ldquo;mr.kernel, check my assumption please&rdquo; tool. The kernel will wake you up immediately if a != b, otherwise it will put you to sleep.
-`futex_broadcast(a) wakes up all the threads sleeping on address a.</p>
+<p><code>futex_wait(a, b)</code> is a &ldquo;mr.kernel, check my assumption please&rdquo; tool. The kernel will wake you up immediately if a != b, otherwise it will put you to sleep.<br>
+<code>futex_broadcast(a)</code> wakes up all the threads sleeping on address a.</p>
 
 <p>Here&rsquo;s a simple example:</p>
 
