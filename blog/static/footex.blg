@@ -85,7 +85,7 @@ designed, it's not particularly efficient. You don't want to have to manage an u
 On to the next fun exercise, building a lock!
 Locks are built out of two new important parts: `atomic_compare_exchange_strong` and `futex_signal`.
 
-`atomic_compare_exchange_strong(a, b, c)` attempts to atomically swap a with c, if a == b. By swapping in `lock`, or `unlock`, you ensure only that one thread can grab or release the lock at a time. (this is sometimes referred to as compare-and-swap)
+`atomic_compare_exchange_strong(a, b, c)` attempts to atomically swap a with c, if a == b. By swapping in `locked`(1), or `unlocked`(0), you ensure only that one thread can grab or release the lock at a time. (this is sometimes referred to as compare-and-swap)
 (on x86, it compiles down to `cmpxchg` with the `lock` prefix)
 
 `futex_signal(a)` wakes up only 1 thread sleeping on the lock (a).
