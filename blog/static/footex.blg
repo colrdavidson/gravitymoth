@@ -132,4 +132,5 @@ Ok, now for a pile of papers and cool things using them.
 
 - Initial work from the [2002 Ottawa Linux Symposium](https://www.kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf)
 - For *recursive* mutexes and optimization, Ulrich talks about tricky bugs in his [paper](https://www.akkadia.org/drepper/futex.pdf)
+- More musing on futexes and drepper's work lives over at [locklessinc](http://locklessinc.com/articles/mutex_cv_futex/)
 - I wrote a work-stealing threadpool for the [Odin](https://github.com/odin-lang/Odin) compiler, available as a [tiny C11 library](https://github.com/colrdavidson/workpool)
