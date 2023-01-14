@@ -60,7 +60,7 @@ We&rsquo;ll get into it with some examples.</p>
 
 <h3>Ready to Go? Futex Flags</h3>
 
-<p>Let&rsquo;s start with something simple, a ready condition!
+<p>Let&rsquo;s start with a ready flag!
 These can be handy for making threads wait after start up, so that main has some time to pass them all things to do.</p>
 
 <p>In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you&rsquo;re expecting.
