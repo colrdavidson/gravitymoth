@@ -8,19 +8,19 @@ There's a ton of names floating around for thread-primitives, many of which are 
 I'll start by defining terms for this article, to help keep things straight.
 
 ## Defining Terms
-Mutexes (Locks) are a way to ensure only *one* thread can run some section of code, or touch some resource for a period of time.
+**Mutexes (Locks)** are a way to ensure only *one* thread can run some section of code, or touch some resource for a period of time.
 If you use pthreads, you might use a `pthread_mutex`, or for MSVC, a `CriticalSection` can be used to cover the same need.
 
-Semaphores are like mutexes, except they count. You can set a maximum number of threads in a section at a time.
+**Semaphores** are like mutexes, except they count. You can set a maximum number of threads in a section at a time.
 
-Condition variables are used for data signalling with locking, often used for managing thread pools. All threadpool workers might
+**Condition Variables** are used for data signalling with locking, often used for managing thread pools. All threadpool workers might
 sleep on a condition variable, and when work is pushed the workers can be woken up sequentially, owning an exclusive lock to grab
 a task from the pool.
 
-Read-Write Mutexes are mutexes with a little more fine-grained access control. Typically, they're used to allow many readers into a section, and
+**Read-Write Mutexes** are mutexes with a little more fine-grained access control. Typically, they're used to allow many readers into a section, and
 then lock more firmly (ensuring there are no readers still in the section) when a write needs to happen.
 
-So, what's a `futex` then? Futexes are a very handy thread primitive, provided by most major kernels (Windows, Linux, OSX, BSDs).
+So, what's a **Futex** then? Futexes are a very handy thread primitive, provided by most major kernels (Windows, Linux, OSX, BSDs).
 We'll get into it with some examples.
 
 ## Futexes For Great Good
