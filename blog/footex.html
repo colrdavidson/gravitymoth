@@ -175,11 +175,31 @@ bit of efficiency in an edge-case for much faster general throughput. Because I 
 <p><a href="https://github.com/colrdavidson/workpool/blob/main/pool.h#L313">Threadpool code to dig through</a></p>
 
 <ul>
-<li>Main must participate in the work &ndash; When debugging, it&rsquo;s much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don&rsquo;t need to spin up any threads</li>
-<li>Workers can only push tasks on to their own queues &ndash; No work can sneak into their queues, so all work always gets completed</li>
-<li>Every worker but main is allowed to steal from any other thread&rsquo;s queue &ndash; Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack</li>
-<li>The worker doing the last task in the pool <em>must</em> try to wake main &ndash; If main doesn&rsquo;t do the last task, or if the thread with the last task doesn&rsquo;t wake main, your program will never finish</li>
-<li>Any time new work gets added to any queue, threads get a wake-up signal &ndash; This notifies sleeping threads that &ldquo;hey, you&rsquo;ve got potential work to steal!&rdquo;</li>
+<li><strong>Main must participate in the work</strong>
+
+<ul>
+<li>When debugging, it&rsquo;s much easier if you can shut off threads and still run the same codepaths. Main participation means that, when debugging you don&rsquo;t need to spin up any threads</li>
+</ul></li>
+<li><strong>Workers can only push tasks on to their own queues</strong>
+
+<ul>
+<li>No work can sneak into their queues, so all work always gets completed</li>
+</ul></li>
+<li><strong>Every worker but main is allowed to steal from any other thread&rsquo;s queue</strong>
+
+<ul>
+<li>Main not stealing simplifies the code, and you can get comparable all-core performance by spinning up N+1 threads, so a stealing worker can pick up the slack</li>
+</ul></li>
+<li><strong>The worker doing the last task in the pool <em>must</em> try to wake main</strong>
+
+<ul>
+<li>If main doesn&rsquo;t do the last task, or if the thread with the last task doesn&rsquo;t wake main, your program will never finish</li>
+</ul></li>
+<li><strong>Any time new work gets added to any queue, threads get a wake-up signal</strong>
+
+<ul>
+<li>This notifies sleeping threads that &ldquo;hey, you&rsquo;ve got potential work to steal!&rdquo;</li>
+</ul></li>
 </ul>
 
 <p>Spot the race condition in the code? It&rsquo;s a little tricky! There&rsquo;s no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks, and done stealing,
