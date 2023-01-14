@@ -36,7 +36,7 @@ if a == b {
 return
 ```
 In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you're expecting.
-For this example however, we'll pretend `futex_wait` handles that for us.
+For these examples however, we'll pretend `futex_wait` handles that for us.
 
 `futex_broadcast(a)` wakes up all the threads sleeping on address a.
 
