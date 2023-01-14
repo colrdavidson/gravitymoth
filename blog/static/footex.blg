@@ -1,0 +1,135 @@
+title: Futexes and You
+date: 01-13-2023 21:00 PST
+slug: footex
+desc: How I Learned to Stop Locking and Love the Race Condition
+
+So, first things first, threading is *tricky*, and we don't make it easy for devs trying to learn.
+There's a ton of names floating around for thread-primitives, many of which are confusing. 
+I'll start by defining terms for this article, to help keep things straight.
+
+## Defining Terms
+Mutexes (Locks) are a way to ensure only *one* thread can run some section of code, or touch some resource for a period of time.
+If you use pthreads, you might use a `pthread_mutex`, or for MSVC, a `CriticalSection` can be used to cover the same need.
+
+Semaphores are like mutexes, except they count. You can set a maximum number of threads in a section at a time.
+
+Condition variables are used for data signalling with locking, often used for managing thread pools. All threadpool workers might
+sleep on a condition variable, and when work is pushed the workers can be woken up sequentially, owning an exclusive lock to grab
+a task from the pool.
+
+Read-Write Mutexes are mutexes with a little more fine-grained access control. Typically, they're used to allow many readers into a section, and
+then lock more firmly (ensuring there are no readers still in the section) when a write needs to happen.
+
+So, what's a `futex` then? Futexes are a very handy thread primitive, provided by most major kernels (Windows, Linux, OSX, BSDs).
+We'll get into it with some examples.
+
+## Futexes For Great Good
+We're going to use C11 atomics in x86-land, because they keep things on the dev-side *relatively* simple.
+
+### Ready to Go? Futex Flags
+Let's start with something simple, a ready condition!
+These can be handy for making threads wait after start up, so that main has some time to pass them all things to do.
+
+In practice, futexes on many platforms can wake up unexpectedly, so you have to catch/retry if the value they get is not what you're expecting.
+For this example however, we'll pretend `futex_wait` handles that for us.
+
+`futex_wait(a, b)` is a "mr.kernel, check my assumption please" tool. The kernel will wake you up immediately if a != b, otherwise it will put you to sleep.
+`futex_broadcast(a) wakes up all the threads sleeping on address a.
+
+Here's a simple example:
+```
+void *thread_worker(void *args) {
+	int32_t *ready = (int32_t *)args;
+
+	printf("Checking to see if main is ready yet\n");
+	futex_wait(ready, 0);
+
+	printf("Doing thread things now!\n");
+	for (int i = 0; i < 5; i++) {
+		printf("thread-work %d\n", i);
+	}
+
+	return NULL;
+}
+
+int main(int argc, char **argv) {
+	_Atomic int32_t ready = 0;
+
+	// Spin up all the threads first
+	Thread t1, t2, t3;
+	t1 = thread_create(thread_worker, &ready);
+	t2 = thread_create(thread_worker, &ready);
+	t3 = thread_create(thread_worker, &ready);
+
+	printf("Doing fake work in main to prepare!\n");
+	for (int i = 0; i < 10; i++) {
+		printf("pre-work %d\n", i);
+	}
+
+	// Ok, we're ready to go!
+	ready++;
+	futex_broadcast(&ready);
+
+	thread_end(t1);
+	thread_end(t2);
+	thread_end(t3);
+
+	return 0;
+}
+```
+Typically, you'd use a condition variable / conditional wait for this, but due to the way that API is
+designed, it's not particularly efficient. You don't want to have to manage an unused mutex with your condition, all you really want is a wait condition and a trigger.
+
+### Futex-Mutex: Lock it Down
+
+On to the next fun exercise, building a lock!
+Locks are built out of two new important parts: `atomic_compare_exchange_strong` and `futex_signal`.
+
+`atomic_compare_exchange_strong(a, b, c)` attempts to atomically swap a with c, if a == b. By swapping in `lock`, or `unlock`, you ensure only that one thread can grab or release the lock at a time. (this is sometimes referred to as compare-and-swap)
+(on x86, it compiles down to `cmpxchg` with the `lock` prefix)
+
+`futex_signal(a)` wakes up only 1 thread sleeping on the lock (a).
+
+Meat and potatoes time:
+```
+typedef _Atomic int32_t Mutex;
+
+void mutex_lock(Mutex *lock) {
+	int32_t locked   = 1;
+	int32_t unlocked = 0;
+
+	for (;;) {
+		bool ok = atomic_compare_exchange_strong(lock, &unlocked, locked);
+		if (ok) {
+			return;
+		}
+
+		futex_wait(lock, locked);
+	}
+}
+
+void mutex_unlock(Mutex *lock) {
+	int32_t locked   = 1;
+	int32_t unlocked = 0;
+
+	bool ok = atomic_compare_exchange_strong(lock, &locked, unlocked);
+	if (!ok) {
+		printf("Double unlock?\n");
+		exit(1);
+	}
+
+	futex_signal(lock);
+}
+
+```
+
+Lock-building strategies vary wildly depending on workload, you don't always want to hop right into the futex *right* after a failed compare-and-swap. If your lock is wrapped around a *very* cheap operation, a spin-lock that turns into a futex-lock after a few tries can give you a big win. 
+(A spin-lock runs the compare-and-swap in a while-loop, trying over and over again to grab the lock)
+
+## References
+
+Ok, now for a pile of papers and cool things using them.
+
+- Initial work from the [2002 Ottawa Linux Symposium](https://www.kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf)
+- For *recursive* mutexes and optimization, Ulrich talks about tricky bugs in his [paper](https://www.akkadia.org/drepper/futex.pdf)
+- I wrote a work-stealing threadpool for the [Odin](https://github.com/odin-lang/Odin) compiler, available as a [tiny C11 library](https://github.com/colrdavidson/workpool)
