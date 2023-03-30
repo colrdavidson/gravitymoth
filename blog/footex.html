@@ -175,10 +175,11 @@ If your lock is wrapped around a <em>very</em> cheap operation, a spin-lock that
 
 <h2>Fancy Tricks with Race Conditions</h2>
 
-<p>I used futexes in a work-stealing threadpool I wrote for the <a href="https://github.com/odin-lang/Odin">Odin</a> compiler, to help it scale better for many-core machines.
-One of the clever tricks there, I use an atomic int to track remaining tasks in the pool, and then use a futex() to both put the thread to sleep if there&rsquo;s really no
+<p>I used futexes in a work-stealing threadpool I wrote for the <a href="https://github.com/odin-lang/Odin">Odin</a> compiler, to help it scale better for many-core machines.</p>
+
+<p>One of the clever tricks there, I use an atomic int to track remaining tasks in the pool, and then use a futex() to both put the thread to sleep if there&rsquo;s really no
 more work, or wake up immediately if a new task right after my check came back empty. To make it work properly I leverage a race condition, trading a <em>little</em> bit of efficiency
-when the pool is nearly dry, for more throughput when the pool is saturated. Being able to define constraints for your problem can be a <em>huge</em> win for performance and simplicity,
+when the pool is nearly dry, for more throughput when the pool is saturated. Defining constraints for your problem can be a <em>huge</em> win for performance and simplicity,
 and when dealing with threads, simplicity is critical.</p>
 
 <h3>A Few Constraints</h3>
@@ -213,9 +214,11 @@ and when dealing with threads, simplicity is critical.</p>
 
 <p><a href="https://github.com/colrdavidson/workpool/blob/main/pool.h#L313">Threadpool code to dig through</a></p>
 
-<p>Spot the race condition in the code? It&rsquo;s a little tricky! There&rsquo;s no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks and done stealing,
-but not yet asleep when the signal comes in, they <em>may</em> go to sleep when they <em>could</em> have stolen a task. That only happens when there&rsquo;s not quite enough work to do though, so it&rsquo;s a little loss
-in efficiency (work is more serial than it could be), to avoid locking and unlocking every time I check or adjust the remaining task count. In practice for Odin, tasks are typically expensive enough
+<p>Spot the race condition in the code? It&rsquo;s a little tricky!</p>
+
+<p>There&rsquo;s no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks and done stealing, but not yet asleep when the signal comes in,
+they <em>may</em> go to sleep when they <em>could</em> have stolen a task. That only happens when there&rsquo;s not quite enough work to do though, so it&rsquo;s a little loss in efficiency
+(work is more serial than it could be), to avoid locking and unlocking every time I check or adjust the remaining task count. In practice for Odin, tasks are typically expensive enough
 and adding new tasks takes long enough that this very rarely occurs. Even when we hit the race condition, all work gets done, it just takes a little longer.</p>
 
 <h2>References</h2>
