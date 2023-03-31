@@ -136,27 +136,32 @@ If your lock is wrapped around a *very* cheap operation, a spin-lock that turns 
 ## Fancy Tricks with Race Conditions
 
 I used futexes in a work-stealing threadpool I wrote for the [Odin](https://github.com/odin-lang/Odin) compiler, to help it scale better for many-core machines.
-In that code, I use an atomic int to track the number of tasks left in the total pool, as sleep on it as a futex to check my assumptions about remaining tasks in the pool.
-To make it work properly, I leverage a race condition, trading a *little* bit of efficiency in an edge-case for much faster general throughput.
-Because I know how the system runs and distributes work, I used a few constraints to keep things zippy.
 
-[Threadpool code to dig through](https://github.com/colrdavidson/workpool/blob/main/pool.h#L313)
+One of the clever tricks there, I use an atomic int to track remaining tasks in the pool, and then use a futex() to both put the thread to sleep if there's really no
+more work, or wake up immediately if a new task right after my check came back empty. To make it work properly I leverage a race condition, trading a *little* bit of efficiency 
+when the pool is nearly dry, for more throughput when the pool is saturated. Defining constraints for your problem can be a *huge* win for performance and simplicity,
+and when dealing with threads, simplicity is critical.
 
+### A Few Constraints
 - **Main must participate in the work**
-	+ When debugging, it's much easier if you can shut off all other threads and still use the taskpool's codepath.
-- **Workers can only push tasks on to their own queues**
-	+ Threads never have unexpected work show up in their own queues, so all work always gets completed
-- **Every worker but main is allowed to steal from any other thread's queue**
-	+ This simplifies the code and you can get proper full-core performance by spinning up N+1 threads, so that every core has a thread that can steal
+	+ Debugging task bugs gets way easier if you can shut off all child threads, run the pool's work on only the main thread, and still hit most of the threadpool's code.
+- **Workers can only push tasks to their own queues**
+	+ Threads always know the max number of active tasks in their queues, so they won't sleep before it's all finished
+- **All threads except main can steal tasks**
+	+ Main doesn't *need* to steal, this simplifies main's runner a little.
 - **The worker doing the last task in the pool *must* try to wake main**
-	+ If main doesn't do the last task, or if the thread with the last task doesn't wake main, your program will never finish
+	+ If the thread with the last task doesn't wake main, and main didn't do the last task, your program will never finish
 - **Any time new work gets added to any queue, threads get a wake-up signal**
 	+ This lets sleeping threads know that "hey, you might have work to steal!"
 
-Spot the race condition in the code? It's a little tricky! There's no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks, and done stealing,
-but not yet asleep when the signal comes in, they *may* go to sleep when they *could* have stolen a task. That only happens when there's not quite enough work to do though, so it's a little loss
-in efficiency (work is more serial than it could be), to avoid locking and unlocking every time I check or adjust the remaining task count. In practice for Odin, tasks are typically expensive enough
-and adding new tasks takes long enough that this very rarely occurs. Even with the race all work gets done, it just takes a little longer.
+[Threadpool code to dig through](https://github.com/colrdavidson/workpool/blob/main/pool.h#L313)
+
+Spot the race condition in the code? It's a little tricky!
+
+There's no guarantee that threads will be woken up when new tasks get added. If threads are done with their own tasks and done stealing, but not yet asleep when the signal comes in, 
+they *may* go to sleep when they *could* have stolen a task. That only happens when there's not quite enough work to do though, so it's a little loss in efficiency 
+(work is more serial than it could be), to avoid locking and unlocking every time I check or adjust the remaining task count. In practice for Odin, tasks are typically expensive enough
+and adding new tasks takes long enough that this very rarely occurs. Even when we hit the race condition, all work gets done, it just takes a little longer.
 
 ## References
 
