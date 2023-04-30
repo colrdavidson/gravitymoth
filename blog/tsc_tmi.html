@@ -67,7 +67,7 @@ There&rsquo;s a fun note in the linux kernel lore, mentioning the offset between
 First came the PIT, a programmable interrupt timer with a known low-ish frequency, somewhere around ~1 MHz
 Then came the PIC, a programmable interrupt controller, soon followed by the APIC (advanced programmable interrupt controller), which contains it&rsquo;s own timer.
 You might ask, what&rsquo;s the frequency of the APIC? Uhhhhhh, make a good guess, because x86 ain&rsquo;t telling you.
-Here starts our sad back and forth descent into madness.</p>
+Here starts our descent into madness.</p>
 
 <p>So, around 2004, Microsoft and Intel figured it might be a good idea to add one more timer: The HPET!
 The HPET is accessible after pawing through the acronym-fever-dream that is ACPI, and runs at a frequency that you can query, but it&rsquo;s an order of magnitude at least, slower than the CPU core clock. The HPET is also <em>sloooow</em> to query.</p>
