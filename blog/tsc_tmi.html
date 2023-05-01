@@ -38,9 +38,11 @@
 		</div>
 		<div class="root">
 			<section id="header"><h1>Timing on x86: TSC TMI</h1><h5>Sun, 30 Apr 2023</h5><div class="link-row"><a class="older-link" href="footex.html">Older<i class="fa fa-arrow-right"/></i></a></div></section>
-			<section id="content"><p>Doing accurate profiling is <em>hard</em>. There&rsquo;s a ton of mythology and nonsense about there about &ldquo;the right way to do it&rdquo;. Microsoft, Intel and AMD haven&rsquo;t helped.</p>
+			<section id="content"><p>Doing accurate profiling is <em>hard</em>. There&rsquo;s a ton of mythology and nonsense about there about &ldquo;the right way to do it&rdquo;.
+Microsoft, Intel and AMD haven&rsquo;t helped.</p>
 
-<p>On <em>almost</em> every x86 processor around the time the first i7s (Nehalem) and AMD Phenom launched, we&rsquo;ve had access to a very high frequency timer with a constant/invariant clockrate, the TSC (timestamp counter).</p>
+<p>On <em>almost</em> every x86 processor around the time the first i7s (Nehalem) and AMD Phenom launched, we&rsquo;ve had access to a very high
+frequency timer with a constant/invariant clockrate, the TSC (timestamp counter).</p>
 
 <h2>The High-Level Stuff</h2>
 
@@ -49,49 +51,66 @@
 <ul>
 <li>The TSC is a timestamp counter</li>
 <li>The TSC&rsquo;s frequency is not exposed on most processors</li>
-<li>The TSC clockspeed on modern machines doesn&rsquo;t change when the CPU turbos or goes to sleep, so you can often use it as a steady monotonic time-source (aside - VMs get tricky and there are buggy CPU families out there)</li>
-<li>The TSC read instruction, <code>rdtsc</code> is non-serializing, meaning that the processor can reorder your code around the read, obscuring/invalidating your timing (<a href="https://github.com/dterei/gotsc">useful notes on serialization</a>)</li>
+<li>The TSC clockspeed on modern machines doesn&rsquo;t change when the CPU turbos or goes to sleep, so you can often use it as a steady
+monotonic time-source (aside - VMs get tricky and there are buggy CPU families out there)</li>
+<li>The TSC read instruction, <code>rdtsc</code> is non-serializing, meaning that the processor can reorder your code around the read,
+obscuring/invalidating your timing (<a href="https://github.com/dterei/gotsc">useful notes on serialization</a>)</li>
 </ul>
 
-<p>Please note the name here. The <em>timestamp</em> counter. It doesn&rsquo;t track cycles. If you want cycle counting, you want the PMCs (performance monitoring counters).
-The TSC often runs at a similar speed to your processor. It does not match the processor&rsquo;s base clock on every machine. It cannot be used as a universal fits-all cycle counter.</p>
+<p>Please note the name here. The <em>timestamp</em> counter. It doesn&rsquo;t track cycles. If you want cycle counting, you want the
+PMCs (performance monitoring counters). The TSC often runs at a similar speed to your processor. It does not match the
+processor&rsquo;s base clock on every machine. It cannot be used as a universal fits-all cycle counter.</p>
 
-<p>Up until Skylake, Intel didn&rsquo;t bother to expose the TSC frequency in a consistent way (presumably figuring you could just look at base clock and use that instead, ignoring all the fun caveats that apply there),
-so you had to use another timer with a known frequency to approximate (<a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/tsc.c#L638">A small taste of the madness in the Linux Kernel</a>). Skylake is special because they started adding EMI reduction circuitry, slowing the TSC slightly, and making it notably offset from the CPU base clock.
-There&rsquo;s a fun note in the linux kernel lore, mentioning the offset between skylake workstation and skylake server clocks, for the same CPU speed.
+<p>Up until Skylake, Intel didn&rsquo;t bother to expose the TSC frequency in a consistent way (presumably figuring you could just look at
+base clock and use that instead, ignoring all the fun caveats that apply there), so you had to use another timer with a known frequency
+to approximate (<a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/tsc.c#L638">A small taste of the madness in the Linux Kernel</a>).
+Skylake is special because they started adding EMI reduction circuitry, slowing the TSC slightly, and making it notably offset
+from the CPU base clock. There&rsquo;s a fun note in the linux kernel lore, mentioning the offset between skylake workstation and
+skylake server clocks, for the same CPU speed.
 <a href="https://lore.kernel.org/lkml/ff6dcea166e8ff8f2f6a03c17beab2cb436aa779.1513920414.git.len.brown@intel.com/">LKML on Skylake EMI quirks</a></p>
 
 <h2>TSC Kernel Calibration Nightmares</h2>
 
-<p>So, how do you calibrate the TSC in the first place, you might ask? Oh my sweet summer child, let me take you on an abbreviated <em>magical</em> journey through x86 history.
-First came the PIT, a programmable interrupt timer with a known low-ish frequency, somewhere around ~1 MHz
-Then came the PIC, a programmable interrupt controller, soon followed by the APIC (advanced programmable interrupt controller), which contains it&rsquo;s own timer.
-You might ask, what&rsquo;s the frequency of the APIC? Uhhhhhh, make a good guess, because x86 ain&rsquo;t telling you.
-Here starts our descent into madness.</p>
+<p>So, how do you calibrate the TSC in the first place, you might ask? Oh my sweet summer child, let me take you on an
+abbreviated <em>magical</em> journey through x86 history. First came the PIT, a programmable interrupt timer with a known low-ish frequency,
+somewhere around ~1 MHz. Then came the PIC, a programmable interrupt controller, soon followed by the APIC
+(advanced programmable interrupt controller), which contains it&rsquo;s own timer. You might ask, what&rsquo;s the frequency of the APIC?
+Uhhhhhh, make a good guess, because x86 ain&rsquo;t telling you. Here starts our descent into madness.</p>
 
 <p>So, around 2004, Microsoft and Intel figured it might be a good idea to add one more timer: The HPET!
-The HPET is accessible after pawing through the acronym-fever-dream that is ACPI, and runs at a frequency that you can query, but it&rsquo;s an order of magnitude at least, slower than the CPU core clock. The HPET is also <em>sloooow</em> to query.</p>
+The HPET is accessible after pawing through the acronym-fever-dream that is ACPI, and runs at a frequency
+that you can query, but it&rsquo;s an order of magnitude at least, slower than the CPU core clock. The HPET is also <em>sloooow</em> to query.</p>
 
-<p>Another bright bulb thought it might be cool to have yet another timer, the pmtimer for power management. At least they give you the frequency. Oh boy though, another low-frequency timer!</p>
+<p>Another bright bulb thought it might be cool to have yet another timer, the pmtimer for power management.
+At least they give you the frequency. Oh boy though, another low-frequency timer!</p>
 
-<p>Thankfully, we&rsquo;ve got the TSC still, which is <em>tolerably</em> fast to read; Using the <a href="https://www.agner.org/optimize/instruction_tables.pdf">Agner Fog tables</a> for reference between Intel and AMD, it takes somewhere between ~18 and ~45 cycles to return a value,
-which for modern (3 GHz) speeds lands somewhere in the ballpark of ~6-15ns. Doesn&rsquo;t seem like a ton, but it adds up if you need millions of timestamps per second.</p>
+<p>Thankfully, we&rsquo;ve got the TSC still, which is <em>tolerably</em> fast to read; Using the
+<a href="https://www.agner.org/optimize/instruction_tables.pdf">Agner Fog tables</a> for reference between Intel and AMD, it takes somewhere
+between ~18 and ~45 cycles to return a value, which for modern (3 GHz) speeds lands somewhere in the ballpark of ~6-15ns.
+Doesn&rsquo;t seem like a ton, but it adds up if you need millions of timestamps per second.</p>
 
-<p>So, how does the kernel schedule wake ups, without drowning in scheduler overhead? They set up the APIC, <em>sometimes</em> using the TSC as reference! Oh boy!
-A well-written kernel has a fun struggle on boot: timer guess-calibration. You can&rsquo;t know for every platform what your <em>actually</em> useful clock&rsquo;s frequency is, so you write a driver for another mostly
-useless timer, grab a start timestamp, sleep, grab an end, and compare. Greg Kroah-Hartman of Linux kernel fame, has a few choice words on this one in the <a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/hpet.c#L949">HPET driver</a> :P</p>
+<p>So, how does the kernel schedule wake ups, without drowning in scheduler overhead? They set up the APIC, <em>sometimes</em> using the TSC
+as reference! Oh boy! A well-written kernel has a fun struggle on boot: timer guess-calibration. You can&rsquo;t know for every platform
+what your <em>actually</em> useful clock&rsquo;s frequency is, so you write a driver for another mostly useless timer, grab a start timestamp,
+sleep, grab an end, and compare. Greg Kroah-Hartman of Linux kernel fame, has a few choice words on this one in the
+<a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/hpet.c#L949">HPET driver</a> :P</p>
 
 <h2>So, How Do I Count Cycles?</h2>
 
 <p>How accurate a number do you need?</p>
 
-<p>Even with turbo-boost disabled, some machines downclock when running heavier SIMD instructions, throwing off your numbers again, and thermal throttling on laptops, mobile devices, and poorly ventilated PCs may also downclock and skew your data.
-It&rsquo;s perfectly ok to want to track time. Time is still a useful metric, and cycles aren&rsquo;t cross-family portable anyways.</p>
+<p>Even with turbo-boost disabled, some machines downclock when running heavier SIMD instructions, throwing off your numbers again,
+and thermal throttling on laptops, mobile devices, and poorly ventilated PCs may also downclock and skew your data. It&rsquo;s perfectly ok
+to want to track time. Time is still a useful metric, and cycles aren&rsquo;t cross-family portable anyways.</p>
 
-<p>The OS might not provide an accurate frequency for your TSC though. On Linux, OSX, and FreeBSD, it&rsquo;s not hard to get. On Windows, it&rsquo;s not directly accessible, but you can play a few little tricks if you know what specific version of Windows you are on.
-There&rsquo;s some <a href="https://hero.handmade.network/forums/code-discussion/t/7485-queryperformancefrequency_returning_10mhz_bug/2">research</a> out there for extracting frequency out of Windows, but it&rsquo;s very version dependent.</p>
+<p>The OS might not provide an accurate frequency for your TSC though. On Linux, OSX, and FreeBSD, it&rsquo;s not hard to get. On Windows, it&rsquo;s
+not directly accessible, but you can play a few little tricks if you know what specific version of Windows you are on.
+There&rsquo;s some <a href="https://hero.handmade.network/forums/code-discussion/t/7485-queryperformancefrequency_returning_10mhz_bug/2">research</a>
+out there for extracting frequency out of Windows, but it&rsquo;s very version dependent.</p>
 
-<p>Rather than providing a TSC frequency directly, Windows ships <code>QueryPerformanceCounter</code> and <code>QueryPerformanceFrequency</code>, billed as a one-stop shop for high-resolution timing. Depending on what you want to do, these functions can be a trap. They round to the nearest 100ns. When trying to capture intervals shorter than their 100ns window, they&rsquo;re practically useless.</p>
+<p>Rather than providing a TSC frequency directly, Windows ships <code>QueryPerformanceCounter</code> and <code>QueryPerformanceFrequency</code>, billed as
+a one-stop shop for high-resolution timing. Depending on what you want to do, these functions can be a trap. They round to the
+nearest 100ns. When trying to capture intervals shorter than their 100ns window, they&rsquo;re practically useless.</p>
 
 <p><a href="https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps">MS on QPF/QPC quirks</a>.
 At this point the <em>vast</em> majority of x86 machines have an invariant/constant TSC, so some of the original MS concern no longer applies.</p>
@@ -99,17 +118,23 @@ At this point the <em>vast</em> majority of x86 machines have an invariant/const
 <h2>No, Really, How Do I Count Cycles?</h2>
 
 <p>If you <em>really</em> want <em>cycles</em> you&rsquo;re going to have to dig a little deeper.
-x86&rsquo;s PMCs support a bunch of fun counter options including cycle counting, but are only directly available in kernel drivers, because they&rsquo;re a shared resource. VTune ships a driver that pokes the PMCs on Windows, so they can do more detailed performance analysis.
-On Linux, <a href="https://man7.org/linux/man-pages/man2/perf_event_open.2.html">perf_events</a> can poke the PMCs for you, although it is not a perfect solution.</p>
+x86&rsquo;s PMCs support a bunch of fun counter options including cycle counting, but are only directly available in kernel drivers,
+because they&rsquo;re a shared resource. VTune ships a driver that pokes the PMCs on Windows, so they can do more detailed performance analysis.
+On Linux, <a href="https://man7.org/linux/man-pages/man2/perf_event_open.2.html">perf_events</a> can poke the PMCs for you, although
+it is not a perfect solution.</p>
 
-<p>There are kernels out there for doing proper metrology. On a normal system, you can get interrupted in the middle of running your code. Your task can get swapped out, other cores can poke your memory and trigger interrupts, etc.
-If you want numbers that are as clean as possible, you need to start looking at better options. <a href="https://gamozolabs.github.io/metrology/2019/08/19/sushi_roll.html">Sushi Roll</a> is one example, they&rsquo;ve done some fascinating work to try to extract
-timing information about all sorts of different parts of the pipeline.</p>
+<p>There are kernels out there for doing proper metrology. On a normal system, you can get interrupted in the middle of running your code.
+Your task can get swapped out, other cores can poke your memory and trigger interrupts, etc.
+If you want numbers that are as clean as possible, you need to start looking at better options.
+<a href="https://gamozolabs.github.io/metrology/2019/08/19/sushi_roll.html">Sushi Roll</a> is one example, they&rsquo;ve done some fascinating
+work to try to extract timing information about all sorts of different parts of the pipeline.</p>
 
-<p>At the end of the day, x86 is a fussy beast. It&rsquo;s going to reorder you, it&rsquo;s going to fudge clocks, it&rsquo;s going to have racy cross-CCX memory stalls. You can&rsquo;t get completely perfect numbers in the normal day-to-day, but you <em>can</em> get close enough
+<p>At the end of the day, x86 is a fussy beast. It&rsquo;s going to reorder you, it&rsquo;s going to fudge clocks, it&rsquo;s going to have racy
+cross-CCX memory stalls. You can&rsquo;t get completely perfect numbers in the normal day-to-day, but you <em>can</em> get close enough
 to make somewhat informed performance choices.</p>
 
-<p><strong><em>This is a very detail-heavy summary, I&rsquo;m sure I&rsquo;ve screwed it up here and there. If you spot any errors, let me know, I&rsquo;d like this to be as accurate as possible!</em></strong></p>
+<p><strong><em>This is a very detail-heavy summary, I&rsquo;m sure I&rsquo;ve screwed it up here and there. If you spot any errors, let me know, I&rsquo;d like this
+to be as accurate as possible!</em></strong></p>
 </section>
 			<section id="sidebar">
 				<ul><a class="slug-entry selected"><li><p>Timing on x86: TSC TMI</p></li></a><a class="slug-entry" href="footex.html"><li><p>Futexes and You</p></li></a><a class="slug-entry" href="missinglinux1.html"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
