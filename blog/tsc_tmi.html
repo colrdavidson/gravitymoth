@@ -54,7 +54,7 @@ frequency timer with a constant/invariant clockrate, the TSC (timestamp counter)
 <li>The TSC clockspeed on modern machines doesn&rsquo;t change when the CPU turbos or goes to sleep, so you can often use it as a steady
 monotonic time-source (aside - VMs get tricky and there are buggy CPU families out there)</li>
 <li>The TSC read instruction, <code>rdtsc</code> is non-serializing, meaning that the processor can reorder your code around the read,
-obscuring/invalidating your timing (<a href="https://github.com/dterei/gotsc">useful notes on serialization</a>)</li>
+obscuring/invalidating your timing (<a href="https://github.com/dterei/gotsc">more info</a>).</li>
 </ul>
 
 <p>Please note the name here. The <em>timestamp</em> counter. It doesn&rsquo;t track cycles. If you want cycle counting, you want the
@@ -63,11 +63,11 @@ processor&rsquo;s base clock on every machine. It cannot be used as a universal 
 
 <p>Up until Skylake, Intel didn&rsquo;t bother to expose the TSC frequency in a consistent way (presumably figuring you could just look at
 base clock and use that instead, ignoring all the fun caveats that apply there), so you had to use another timer with a known frequency
-to approximate (<a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/tsc.c#L638">A small taste of the madness in the Linux Kernel</a>).
-Skylake is special because they started adding EMI reduction circuitry, slowing the TSC slightly, and making it notably offset
-from the CPU base clock. There&rsquo;s a fun note in the linux kernel lore, mentioning the offset between skylake workstation and
-skylake server clocks, for the same CPU speed.
-<a href="https://lore.kernel.org/lkml/ff6dcea166e8ff8f2f6a03c17beab2cb436aa779.1513920414.git.len.brown@intel.com/">LKML on Skylake EMI quirks</a></p>
+to approximate a small taste of the <a href="https://github.com/torvalds/linux/blob/master/arch/x86/kernel/tsc.c#L638">madness</a> in the
+Linux kernel. Skylake is special because they started adding EMI reduction circuitry, slowing the TSC slightly, and making it
+notably offset from the CPU base clock.
+There&rsquo;s a fun <a href="https://lore.kernel.org/lkml/ff6dcea166e8ff8f2f6a03c17beab2cb436aa779.1513920414.git.len.brown@intel.com/">note</a>
+in the linux kernel lore, mentioning the offset between skylake workstation and skylake server clocks, for the same CPU speed.</p>
 
 <h2>TSC Kernel Calibration Nightmares</h2>
 
