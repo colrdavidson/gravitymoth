@@ -1,0 +1,237 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<meta property="og:type"         content="website" />
+		<meta property="og:site_name"    content="Gravity Moth" />
+		<meta property="og:title"        content="Spall" />
+		<meta property="og:description"  content="Fast, Portable Profiling" />
+		<meta property="og:url"          content="https://gravitymoth.com/spall" />
+		<meta property="og:image"        content="https://gravitymoth.com/media/spall_unfurl.png" />
+		<meta name="twitter:card"        content="summary_large_image" />
+		<meta name="twitter:title"       content="Spall" />
+		<meta name="twitter:description" content="Fast, Portable Profiling" />
+		<meta name="twitter:image:src"   content="https://gravitymoth.com/media/spall_unfurl.png" />
+
+		<link rel="stylesheet" href="../style.css">
+		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth - Spall Web</title>
+	</head>
+	<script>
+		function load_spall() {
+			let spall_frame = "<iframe class=\"spall-frame\" src=\"/spall/spall.html\" id=\"spall\" allowfullscreen></iframe>";
+			document.getElementById("demo").innerHTML = spall_frame;
+			document.getElementById("fullscreen-button").classList.remove("invisible");
+		}
+		function load_manual() {
+			window.open("spall.html", '_blank');
+		}
+
+		function set_fullscreen() {
+			document.getElementById("spall").requestFullscreen();
+		}
+	</script>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root spall">
+			<section id="header">
+				<div class="header-line">
+					<h1>Spall</h1>
+					<a href="https://github.com/colrdavidson/spall" class="github-link"><i class="fa fa-github" aria-hidden="true"></i></a>
+					<a href="https://github.com/sponsors/colrdavidson" class="sponsors-link"><i class="fa fa-heart" aria-hidden="true"></i></a>
+				</div>
+				<h5>Spall-web is a code profiler that runs in your browser</h5>
+			</section>
+			<section id="demo" class="spall-frame-box">
+				<div class="button-box">
+					<button onclick="load_spall()">Start Spall</button>
+					<button class="manual" onclick="load_manual()" title="Open Spall in a New Tab"><i class="fa fa-external-link"></i></button>
+				</div>
+				<div class="warning">
+					<h4>Heads up!</h4>
+					<p>spall isn't mobile-friendly due to the serious memory and screen constraints most 
+					mobile devices have. If you're not on a desktop, you should use one for this instead!</p>
+				</div>
+			</section>
+			<section id="sidebar">
+				<ul>
+					<a id="fullscreen-button" class="slug-entry special invisible" onclick="set_fullscreen()">
+						<li>
+							<p class="button-dumb">
+								<i class="literally-me">&#9974;</i>
+								Fullscreen Spall
+							</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#">
+						<li>
+							<p>Spall Demo</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#spall-walkthrough">
+						<li>
+							<p>Walkthrough</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#basic-features">
+						<li>
+							<p>Basic Features</p>
+						</li>
+					</a>
+					<a class="slug-entry" href="#extra-goodies">
+						<li>
+							<p>Extra Goodies</p>
+						</li>
+					</a>
+					<a class="slug-entry special" onclick="load_manual()">
+						<li>
+							<p class="button-dumb">
+								<i class="literally-me fa fa-external-link"></i>
+								Spall in a New Tab
+							</p>
+						</li>
+					</a>
+				</ul>
+			</section>
+			<section id="content">
+				<h2>What is Spall?</h2>
+				<p>Spall is a tool for viewing traces that runs in your browser, and a small header-only C library for
+				tracing your projects.</p>
+				<div class="short-notes-box">
+					<div class="video-wrapper">
+						<video autoplay loop muted playsinline>
+							<source src="../media/recent_spall.mp4" type="video/mp4">
+						</video>
+					</div>
+					<div>
+						<h3>The Short Notes</h3>
+						<ul>
+							<li>Supports chrome, dtrace and C/C++ backends</li>
+							<li>Runs as fast as your monitor does</li>
+							<li>Can handle up to 2 GB JSON traces</li>
+							<li>Supports chrome devtools sampling data</li>
+							<li>Gives you handy runtime stats</li>
+						</ul>
+					</div>
+				</div>
+				<h2>Getting Started With Spall</h2>
+				<h3>For Web-Profiler Vets</h3>
+				<p>If you're an old-hat with <code>chrome://tracing</code>, <code>speedscope</code>, or <code>perfetto</code>, you should feel right at home.
+				Spall supports most of the <code>chrome://tracing</code>/<code>speedscope</code>/<code>perfetto</code> JSON format. You should be able to get 
+				off and running with your existing files and JSON trace dumping code. If you use chrome's sampling profiler for bigger captures and 
+				you're struggling to view them, Spall can ingest and display those files too!</p>
+				<h3 id="spall-walkthrough">For Everybody Else</h3>
+				<p>If you want to learn to use Spall and get a quick briefer on profilers, keep reading!</p>
+
+				<p>Profilers <i>typically</i> come in two flavors, <b>sampling</b> and <b>tracing</b>. Spall is a frontend with support
+				for both tracing and sampling profiler libraries. Spall is mostly used for tracing, where function begin and ends get timed
+				and written to a file. Sampling, where the profiler takes a snapshot of your program on an interval, can be a little easier to 
+				configure but can miss shorter-lived functions completely, and provides very little data for programs with short runtimes.</p>
+
+				<p>Spall includes a <a href="https://github.com/colrdavidson/spall/blob/master/spall.h">small, single-header C library</a>,
+				to make tracing easy. For relatively simple programs using clang or gcc, you can use <code>-finstrument-functions</code>
+				to instrument your whole program quickly. For more complex programs, you might want to manually instrument specific 
+				parts of your code to reduce your trace sizes and keep your runtimes a little more accurate.</p>
+
+				<p>The common advice for profilers is to sample first, and then trace sparingly to narrow in on the problem,
+				but if your traces are cheap enough (Spall's traces are around ~12 ns per function for coffeelake-mobile CPUs
+				when configured correctly), with auto-tracing you can often skip right to tracing and get far more useful data. 
+				Hopefully Spall's native version will be shippable soon, so you'll be able to trace bigger programs happily.
+				With the native version prototype as-is, along with `-finstrument-functions` instrumentation,
+				Spall's library can push and display least 8 million functions per second, tracing all
+				of the Odin compiler's 100 million function-calls that get run while compiling Spall itself.</p>
+
+				<p>There are some very simple <a href="https://github.com/colrdavidson/spall/blob/master/examples/">examples</a> to get
+				started with tracing! (If you can't bind against the C header in your project, don't worry, more language support is planned soon!)</p>
+
+				<p>If you want to sample and you're on a platform with <code>dtrace</code> support, there's a lovely community supported library, 
+				<a href="https://github.com/bvisness/dtrace2spall">dtrace2spall</a>, that you can use to get started without changing your code.</p>
+
+				<p>If you're a webdev, you've used the chrome devtools performance tab to profile your website before, and you wanted to get a *little*
+				more information out of that trace, or just not have it stutter when you zoom, you can export it and drop it into spall!
+				Just hit the Save Profile button in the top left, and then drag and drop it into the interface</p>
+
+				<p>Spall demoed live at the <a href="https://handmade-seattle.com">Handmade Seattle conference</a>, 
+				going head-to-head against perfetto, and handily won, with buttery smooth frames and tiny load-times for huge files!</p>
+				<div class="video-frame">
+					<iframe 
+						title="vimeo-player" 
+						src="https://player.vimeo.com/video/776796857?h=eb79b4ca63"
+						frameborder="0"
+						allowfullscreen>
+					</iframe>
+				</div>
+				<p>Check out more excellent talks and demos like Spall over at 
+				<a href="https://guide.handmade-seattle.com/c/2022/">Handmade Seattle's Video Guide</a></p>
+
+				<h3 id="basic-features">Basic Features</h3>
+
+				<p>Once you've got your program instrumented, you can drag-and-drop
+				or click "open file" at the top left, and select your <code>spall</code> or <code>json</code> file, and get started.</p>
+
+				<h4>Navigation</h4>
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/panzoom.mp4" type="video/mp4">
+					</video>
+				</div>
+				<p>Clicking and dragging moves the view around and scrolling zooms in and out</p>
+
+				<h4>Event Selection</h4>
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/singleselect.mp4" type="video/mp4">
+					</video>
+				</div>
+				<p>Clicking on an event brings up some basic information about it</p>
+
+				<h4>Event Multiselection</h4>
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/multiselect.mp4" type="video/mp4">
+					</video>
+				</div>
+				<p>Shift-click allows you to select a chunk of events to run stats on</p>
+
+				<h4>Get All Stats</h4>
+				<div class="video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source src="../media/crunchstats.mp4" type="video/mp4">
+					</video>
+				</div>
+				<p>Clicking on the "get stats for the whole file" button at the top left runs stats for your whole program</p>
+
+				<h4>That's All!</h4>
+				<p>You've got the basics at this point, go have fun!</p>
+
+				<h3 id="extra-goodies">Extra Goodies</h3>
+				<p>The web-version of Spall is available on <a href="https://github.com/colrdavidson/spall">github</a> if you want to go play with the source yourself!</p>
+			</section>
+		</div>
+	</body>
+</html>
