@@ -773,3 +773,17 @@ p > img {
 	margin-left: auto;
 	margin-right: auto;
 }
+
+.pre-spall-link {
+	padding: 0;
+	margin-bottom: 0.5em;
+}
+
+.direction {
+	box-sizing: border-box;
+	padding-bottom: 0.75em;
+}
+
+.direction > h2 {
+	margin-bottom: 0.35em;
+}
