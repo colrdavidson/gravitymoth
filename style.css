@@ -161,6 +161,11 @@ nav {
 	max-width: 70em;
 }
 
+.root.centered {
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	max-width: 70em;
+}
 
 .spall-frame-box {
 	height: 50em;
@@ -222,6 +227,11 @@ nav {
 
 .root.spall > #content {
 	grid-row: 4;
+}
+
+.root.centered {
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .root.main {
@@ -777,6 +787,10 @@ p > img {
 .pre-spall-link {
 	padding: 0;
 	margin-bottom: 0.5em;
+}
+
+.spall-itch-link {
+	max-width: 552px;
 }
 
 .direction {
