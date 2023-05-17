@@ -243,6 +243,10 @@ nav {
 	margin-bottom: 1em;
 }
 
+.root.centered > #header {
+	margin-bottom: 0.5em;
+}
+
 #header {
 	grid-row: 1;
 	grid-column: 1/2;
