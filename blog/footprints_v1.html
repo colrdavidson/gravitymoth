@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+
+		<meta property="og:type"  content="article" /><meta property="og:url" content="https://gravitymoth.com/blog/footprints_v1" /><meta property="og:description" content="First in a series of optimization talks" /><meta property="og:title" content="Not Fast Enough: LOD Trees" /><meta property="twitter:title" content="Not Fast Enough: LOD Trees" /><meta property="og:image" content="https://gravitymoth.com/media/logo_bg.png" /><meta property="og:locale" content="en_US"><meta property="og:site_name" content="Gravity Moth"><meta property="twitter:card" content="summary">
+
+		<link rel="stylesheet" href="../style.css" />
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="header"><h1>Not Fast Enough: LOD Trees</h1><h5>Fri, 12 May 2023</h5><div class="link-row"><a class="older-link" href="tsc_tmi.html">Older<i class="fa fa-arrow-right"/></i></a></div></section>
+			<section id="content" class="slug-footprints_v1"><p>I&rsquo;ve spent the last 6 months working on Spall, trying to push the limit on bigger and bigger traces,
+and slashing load-times to make that possible. My pie in the sky ideal is to load a 1 TB trace in a
+human-friendly amount of time, and display it at 60+ fps.</p>
+
+<p>With the current auto-tracing format, every function eats 32 bytes, so that&rsquo;d be somewhere around
+32 billion events in a trace file.  The maximum dump rate from the auto-tracer is around 45 million
+events per second per core, limited mostly by the users&rsquo;s clockspeed, RDTSC implementation, and linear disk write speed.</p>
+
+<p>Doing a little napkin math, 45M/s is about ~1.5 GB/s of data, so assuming it takes as long to load a file as it does to trace it,
+it would take ~11 minutes to generate, and another 11 minutes to load that trace. Unfortunately, we&rsquo;re not quite there yet.
+I&rsquo;ve recently made some big performance improvements to get closer to that ideal though!
+The old build of Spall-native manages somewhere around ~350 MB/s, the new changes I&rsquo;ve made bring it to around ~650 MB/s, end-to-end.</p>
+
+<p>One of the <em>important</em> things Spall does to make bigger traces viable to render, is the LOD (level-of-detail) tree.
+Spall takes the trace timeline and subdivides it into slices that can be searched quickly, so rather than scanning gigabytes of data
+per frame, it can jump to a subsection of the event array, and only load in the few bits and pieces that the user can see.</p>
+
+<p>So, what changed to make even bigger traces possible? I did a <em>big</em> revamp of the LOD building system. The old system used a
+reverse-eyztinger-like layout with a k-ary tree, chunking the range in 4 functions per tree-leaf, and then building up parent nodes from there.</p>
+
+<p>The old tree had a few 64-bit indexes to help find where each node&rsquo;s children were, where each leaf&rsquo;s functions started in the function array,
+and some flags to help determine whether a node was a leaf or not. That old tree also ate about 40% of the total trace-size in memory, just for the
+caching structure.</p>
+
+<h3>Old Explicit Tree</h3>
+
+<p><img src="../media/old_4ary.png" alt="Old Tree" /></p>
+
+<p>The new tree is far more space efficient! I&rsquo;ve moved to a more implicit tree, with 32 functions per tree-leaf. The tree is now closer to a forward-ordered
+eyztinger tree, so we don&rsquo;t need to store indexes for events and tree nodes, because they can now be computed quickly on the fly. The new setup uses about
+5% of the trace size in LOD memory, so an 11 GB trace across 64 threads from GDB eats about ~550 MB of RAM for the LOD structure instead of ~5 GB.</p>
+
+<h3>New Implicit Tree</h3>
+
+<p><img src="../media/new_4ary.png" alt="New Tree" />
+For more on <a href="https://algorithmica.org/en/eytzinger">Eytzinger Trees</a>, Algorithmica has a solid overview.
+Cliffnotes though, the big win here is that the index of the left child of a node is <code>kn + 1</code>, where <code>k</code> is the arity of the tree, (binary, ternary, 4-ary, etc.), and <code>n</code> is the current node&rsquo;s index. So, for node <code>5</code>, the left child is <code>4*5+1</code> or <code>21</code>, and none of that information needs to be stored.</p>
+
+<p>This along with an increase in the number of functions per leaf, <em>did</em> come at the cost of framerate, although with recent render-performance improvements, I had enough frame-budget to dial back RAM a bit more.
+Now, on my older Intel Mac, rather than running at 200 frames per second, I only get 60 fps for large (6 GB+) traces, and on beefier machines,
+I&rsquo;m down from 400 fps to 200. What a tragedy! :P</p>
+
+<p>I figure, if we&rsquo;ve got the headroom, might as well use it for something worthwhile. There&rsquo;s still plenty of performance improvements left on the table to make.
+I haven&rsquo;t started working with threads yet, although I&rsquo;ve been designing the ingest pipeline and renderer with threads in mind.
+I should be able to parallelize both rendering and loading files, which&rsquo;ll give us a nice little boost because the
+trace data has few cross-thread dependencies, meaning it can be split across a work-pool without <em>too</em> much effort.</p>
+</section>
+			<section id="sidebar">
+				<ul><a class="slug-entry selected"><li><p>Not Fast Enough: LOD Trees</p></li></a><a class="slug-entry" href="tsc_tmi.html"><li><p>Timing on x86: TSC TMI</p></li></a><a class="slug-entry" href="footex.html"><li><p>Futexes and You</p></li></a><a class="slug-entry" href="missinglinux1.html"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
+			</section>
+			<section id="nav-footer" class="link-row"><a class="older-link" href="tsc_tmi.html">Older<i class="fa fa-arrow-right"/></i></a></section>
+		</div>
+	</body>
+</html>

@@ -684,7 +684,7 @@ td {
 	padding: 0.5em;
 }
 
-p > img {
+.slug-dataviz > p > img {
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 }
