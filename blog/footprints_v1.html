@@ -51,39 +51,69 @@ it would take ~11 minutes to generate, and another 11 minutes to load that trace
 I&rsquo;ve recently made some big performance improvements to get closer to that ideal though!
 The old build of Spall-native manages somewhere around ~350 MB/s, the new changes I&rsquo;ve made bring it to around ~650 MB/s, end-to-end.</p>
 
-<p>One of the <em>important</em> things Spall does to make bigger traces viable to render, is the LOD (level-of-detail) tree.
-Spall takes the trace timeline and subdivides it into slices that can be searched quickly, so rather than scanning gigabytes of data
-per frame, it can jump to a subsection of the event array, and only load in the few bits and pieces that the user can see.</p>
+<p>One of the <em>important</em> things Spall does to render <em>big</em> traces quickly is the LOD (level-of-detail) tree.
+Spall takes the trace timeline and divides it into slices that can be searched quickly, so rather than scanning gigabytes of data
+per frame, it can dig into to the big array of functions with only a few lookups, getting functions on screen way faster.</p>
 
-<p>So, what changed to make even bigger traces possible? I did a <em>big</em> revamp of the LOD building system. The old system used a
-reverse-eyztinger-like layout with a k-ary tree, chunking the range in 4 functions per tree-leaf, and then building up parent nodes from there.</p>
+<p>So, what changed to make larger traces faster and lighter to load? I did a <em>big</em> revamp of the LOD building system.
+The old system used an explicit 4-ary tree, splitting the timeline into quarters, with 4 functions per tree-leaf.</p>
 
-<p>The old tree had a few 64-bit indexes to help find where each node&rsquo;s children were, where each leaf&rsquo;s functions started in the function array,
-and some flags to help determine whether a node was a leaf or not. That old tree also ate about 40% of the total trace-size in memory, just for the
-caching structure.</p>
+<p>The old tree had indexes in each node to help find its children, and every leaf contained an index into the function array,
+along with a flag to indicate that the node was a leaf. It ate about ~5 GB per 12 GB trace, all on its own.</p>
 
-<h3>Old Explicit Tree</h3>
+<h3>Old Explicit Tree Layout</h3>
 
 <p><img src="../media/old_4ary.png" alt="Old Tree" /></p>
 
-<p>The new tree is far more space efficient! I&rsquo;ve moved to a more implicit tree, with 32 functions per tree-leaf. The tree is now closer to a forward-ordered
-eyztinger tree, so we don&rsquo;t need to store indexes for events and tree nodes, because they can now be computed quickly on the fly. The new setup uses about
-5% of the trace size in LOD memory, so an 11 GB trace across 64 threads from GDB eats about ~550 MB of RAM for the LOD structure instead of ~5 GB.</p>
+<pre><code>ChunkNode :: struct #packed {
+	start_time:       i64,
+	end_time:         i64,
 
-<h3>New Implicit Tree</h3>
+	avg_color:      FVec3,
+	weight:           i64,
 
-<p><img src="../media/new_4ary.png" alt="New Tree" />
-For more on <a href="https://algorithmica.org/en/eytzinger">Eytzinger Trees</a>, Algorithmica has a solid overview.
-Cliffnotes though, the big win here is that the index of the left child of a node is <code>kn + 1</code>, where <code>k</code> is the arity of the tree, (binary, ternary, 4-ary, etc.), and <code>n</code> is the current node&rsquo;s index. So, for node <code>5</code>, the left child is <code>4*5+1</code> or <code>21</code>, and none of that information needs to be stored.</p>
+	tree_start_idx:  uint,
+	event_start_idx: uint,
 
-<p>This along with an increase in the number of functions per leaf, <em>did</em> come at the cost of framerate, although with recent render-performance improvements, I had enough frame-budget to dial back RAM a bit more.
-Now, on my older Intel Mac, rather than running at 200 frames per second, I only get 60 fps for large (6 GB+) traces, and on beefier machines,
-I&rsquo;m down from 400 fps to 200. What a tragedy! :P</p>
+	tree_child_count:  i8,
+	event_arr_len:     i8,
+}
+</code></pre>
 
-<p>I figure, if we&rsquo;ve got the headroom, might as well use it for something worthwhile. There&rsquo;s still plenty of performance improvements left on the table to make.
-I haven&rsquo;t started working with threads yet, although I&rsquo;ve been designing the ingest pipeline and renderer with threads in mind.
-I should be able to parallelize both rendering and loading files, which&rsquo;ll give us a nice little boost because the
-trace data has few cross-thread dependencies, meaning it can be split across a work-pool without <em>too</em> much effort.</p>
+<p>The new LOD is way more space efficient! I&rsquo;ve moved to an implicit tree, with 32 functions per tree-leaf.
+The tree is now an eyztinger tree, so we don&rsquo;t need to store indexes for functions and tree nodes, they can now be
+computed on the fly. The new setup uses about 5% of the trace size in LOD memory,
+so an 11 GB trace across 64 threads from GDB eats about ~550 MB of RAM for the LOD structure instead of ~5 GB.</p>
+
+<h3>New Implicit Tree Layout</h3>
+
+<p><img src="../media/new_4ary.png" alt="New Tree" /></p>
+
+<pre><code>ChunkNode :: struct #packed {
+	start_time:  i64,
+	end_time:    i64,
+
+	avg_color: FVec3,
+	weight:      i64,
+}
+</code></pre>
+
+<p>For more on <a href="https://algorithmica.org/en/eytzinger">Eytzinger Trees</a>, Algorithmica has a solid overview.</p>
+
+<p>The big win here is that the index of the left child of a node is <code>kn + 1</code>, where <code>k</code> is the arity of the tree,
+(binary, ternary, 4-ary, etc.), and <code>n</code> is the current node&rsquo;s index.
+So, for node <code>5</code>, the left child is <code>4*5+1</code> or <code>21</code>, and none of that information needs to be stored.</p>
+
+<p>This along with an increase in the number of functions per leaf, <em>did</em> come at the cost of framerate,
+although with recent render-performance improvements, I had enough frame-budget to dial back RAM a bit more.
+Now, on my older Intel Mac, rather than running at 200 frames per second, I only get 60 fps for large
+(6 GB+) traces, and on beefier machines, I&rsquo;m down from 400 fps to 200. What a tragedy! :P</p>
+
+<p>I figure, if we&rsquo;ve got the headroom, might as well use it for something worthwhile. There&rsquo;s still plenty of performance
+improvements left on the table to make. I haven&rsquo;t started working with threads yet, although I&rsquo;ve been designing the
+ingest pipeline and renderer with threads in mind. I should be able to parallelize both rendering and loading files,
+which&rsquo;ll give us a nice little boost because the trace data has few cross-thread dependencies, so it can be split across
+a work-pool without <em>too</em> much effort.</p>
 </section>
 			<section id="sidebar">
 				<ul><a class="slug-entry selected"><li><p>Not Fast Enough: LOD Trees</p></li></a><a class="slug-entry" href="tsc_tmi.html"><li><p>Timing on x86: TSC TMI</p></li></a><a class="slug-entry" href="footex.html"><li><p>Futexes and You</p></li></a><a class="slug-entry" href="missinglinux1.html"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
