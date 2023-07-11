@@ -43,23 +43,38 @@
 		<div class="banner">
 			<section id="banner-header">
 				<img src="/media/logo.svg" />
-				<h1 class="announce">Gravity Moth is Coming Soon!</h1>
+				<h1 class="announce">Gravity Moth</h1>
 			</section>
 		</div>
 		<div class="root main">
 			<section id="content">
-				<h2>We're working on bringing you some awesome stuff!</h2>
-				<p>Gravity Moth is working on bringing powerful new debugging tools to Linux!</p>
-				<p>We're not ready for a launch quite yet, there's still quite a lot left to do. I'm tired of fighting with 
-				my tools, this stuff is as much for my sake as it is for all of you. The better the tools get, the faster 
-				the process of iterating on them should go, so I'm hopeful we'll have some fun stuff available soon.</p>
-				<h2>Sneak Peek</h2>
+				<h2>Tools</h2>
+				<div class="link-row">
+					<div class="box-link">
+							<h3>Spall</h3>
+							<img src="/media/odin-landscape.png">
+							<p>Spall is a profiler and code exploration tool, designed to help you sift through billions of events</p>
+							<div class="button-row">
+								<a href="/spall/spall-web.html">
+									<button>Explore Code on the Web!</button>
+								</a>
+								<a href="/spall">
+									<button>Connect with the Community</button>
+								</a>
+								<a href="https://gravitymoth.itch.io/spall">
+									<button>Buy Spall Native</button>
+								</a>
+							</div>
+						</a>
+					</div>
+				</div>
+				<h2>Future Stuff - Sneak Peek</h2>
 				<div class="content-highlight">
 					<h3>Debugging Should Be Legible</h3>
 					<div class="side-by-side">
-						<p>Why don't we have good syntax highlighting for assembly? We use syntax highlighting in many higher-level 
+						<p>Why don't we have good syntax highlighting for assembly? We use syntax highlighting in many higher-level
 						languages daily, to make it easier to quickly scan and follow code flow. It's time to bring disassemblers
-						up to speed with modern, 80s technology. Register motion matters, when things go wrong, a little color 
+						up to speed with modern, 80s technology. Register motion matters, when things go wrong, a little color
 						helps you figure out what happened, fast.</p>
 						<img src="media/asm.png" />
 					</div>
@@ -70,7 +85,7 @@
 						<img src="media/history.png" />
 						<p>When dissecting real catastrophes, inspectors build out a timeline and attempt to retrace footsteps.
 						Debugging code should work the same way. We track the how your program changes registers and memory
-						as it runs, save all your syscalls, and allow you to replay your code exactly the way it failed, 
+						as it runs, save all your syscalls, and allow you to replay your code exactly the way it failed,
 						so you can reliably walk backwards from the problem to find the cause.</p>
 					</div>
 				</div>
@@ -80,12 +95,11 @@
 						<p>Real data has striations, character, and personality. Really understanding a problem might require a
 						new way of looking at your code or your dataset. We try to provide the tools to visualize your problem
 						in a handful of new, unique ways, to help you build strong intuition about your problems. This is a real
-						ELF binary with large static tables of content, plainly visible when displayed 
+						ELF binary with large static tables of content, plainly visible when displayed
 						as a greyscale image.</p>
 						<img src="media/striations.png" />
 					</div>
 				</div>
-			</section>
 			<section id="nav-footer"></section>
 		</div>
 	</body>

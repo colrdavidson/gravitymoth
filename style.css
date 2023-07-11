@@ -805,3 +805,67 @@ td {
 .direction > h2 {
 	margin-bottom: 0.35em;
 }
+
+.box-link {
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+	color: var(--font-color);
+
+	background-color: var(--off-color);
+
+	padding: 1em;
+	border-radius: 10px;
+	margin-bottom: 2em;
+}
+
+.box-link > p {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0.5em;
+	padding-bottom: 0em;
+}
+
+.box-link > .button-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	margin-top: 0.5em;
+}
+
+.box-link > .button-row a > button {
+	cursor: pointer;
+
+	font-family: 'Fira Sans', sans-serif;
+	padding: 1em;
+	background-color: var(--nav-color);
+	color: var(--nav-font-color);
+	border: none;
+	border-radius: 10px;
+
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+.web-button {
+	display: flex;
+	flex-direction: column;
+	max-width: 10em;
+
+	padding: 0.75em;
+	border-radius: 10px;
+	background-color: var(--off-color);
+}
+
+.web-button > p {
+	margin-top: 0.5em;
+	padding-bottom: 0;
+	color: var(--font-color);
+}
+.web-button > p > span {
+	color: var(--link-color);
+}
+
+.web-button {
+	text-decoration: none;
+}
