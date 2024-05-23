@@ -253,6 +253,9 @@ nav {
 	margin-top: 1.5em;
 	margin-bottom: -0.5em;
 }
+#header > h2 {
+	font-size: 12pt;
+}
 
 .header-line {
 	display: flex;
