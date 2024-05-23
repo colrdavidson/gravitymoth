@@ -58,7 +58,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 	chunks := make([]string, 0)
 
 	// these have to be in descending occuring order
-	tags := []string{"{{unfurl}}", "{{header}}", "{{slug}}", "{{content}}", "{{slugs}}", "{{nav-foot}}"}
+	tags := []string{"{{description}}", "{{unfurl}}", "{{header}}", "{{slug}}", "{{content}}", "{{slugs}}", "{{nav-foot}}"}
 
 	cur_chunk := html_template
 	for i, tag := range tags {
@@ -99,6 +99,13 @@ func generate_posts(entries []BlogEntry, html_template string) {
 
 		f.WriteString(chunks[0])
 
+		// Generate description
+		{
+			f.WriteString(entry.Description)
+		}
+
+		f.WriteString(chunks[1])
+
 		// Generate unfurl
 		{
 			f.WriteString(`<meta property="og:type"  content="article" />`)
@@ -122,7 +129,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 			f.WriteString(`<meta property="twitter:card" content="summary">`)
 		}
 
-		f.WriteString(chunks[1])
+		f.WriteString(chunks[2])
 
 		date_str := entry.Date.Format(out_time_fmt)
 		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
@@ -131,15 +138,15 @@ func generate_posts(entries []BlogEntry, html_template string) {
 		f.WriteString(`<div class="link-row">`)
 		generate_link_row(entries, i, f)
 		f.WriteString(`</div>`)
-		f.WriteString(chunks[2])
+		f.WriteString(chunks[3])
 
 		slug_class := fmt.Sprintf("slug-%s", entry.Slug)
 		f.WriteString(slug_class)
-		f.WriteString(chunks[3])
+		f.WriteString(chunks[4])
 
 		html := markdown.ToHTML(entry.Content, nil, nil)
 		f.WriteString(string(html))
-		f.WriteString(chunks[4])
+		f.WriteString(chunks[5])
 
 		for j, s := range slugs {
 			if j == i {
@@ -150,11 +157,11 @@ func generate_posts(entries []BlogEntry, html_template string) {
 				f.WriteString(s)
 			}
 		}
-		f.WriteString(chunks[5])
+		f.WriteString(chunks[6])
 
 		generate_link_row(entries, i, f)
 
-		f.WriteString(chunks[6])
+		f.WriteString(chunks[7])
 	}
 }
 
