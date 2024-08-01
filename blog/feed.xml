@@ -4,6 +4,7 @@
 	<title>Gravity Moth Blog</title>
 	<link>https://gravitymoth.com/blog</link>
 	<description>Tool and Tech Deep Dives</description>
+	<item><title>Building The Stupid Way</title><link>https://gravitymoth.com/blog/vertical_biz</link><description>Vertical Integration as an Indie</description><pubDate>Thu, 01 Aug 2024 12:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/vertical_biz</guid></item>
 	<item><title>Not Fast Enough: LOD Trees</title><link>https://gravitymoth.com/blog/footprints_v1</link><description>First in a series of optimization talks</description><pubDate>Fri, 12 May 2023 15:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/footprints_v1</guid></item>
 	<item><title>Timing on x86: TSC TMI</title><link>https://gravitymoth.com/blog/tsc_tmi</link><description>Please Sir, Can I Have A Frequency?</description><pubDate>Sun, 30 Apr 2023 21:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/tsc_tmi</guid></item>
 	<item><title>Futexes and You</title><link>https://gravitymoth.com/blog/footex</link><description>How I Learned to Stop Locking and Love the Race Condition</description><pubDate>Fri, 13 Jan 2023 21:00:00 +0000</pubDate><guid isPermaLink="true">https://gravitymoth.com/blog/footex</guid></item>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no">
+		<meta name="theme-color" content="#0083B7">
+		<meta name="description" content="Vertical Integration as an Indie">
+
+		<meta property="og:type"  content="article" /><meta property="og:url" content="https://gravitymoth.com/blog/vertical_biz" /><meta property="og:description" content="Vertical Integration as an Indie" /><meta property="og:title" content="Building The Stupid Way" /><meta property="twitter:title" content="Building The Stupid Way" /><meta property="og:image" content="https://gravitymoth.com/media/logo_bg.png" /><meta property="og:locale" content="en_US"><meta property="og:site_name" content="Gravity Moth"><meta property="twitter:card" content="summary">
+
+		<link rel="stylesheet" href="../style.css" />
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
+
+		<script src="../index.js"></script>
+
+		<title>Gravity Moth</title>
+	</head>
+	<body>
+		<nav>
+			<span class="nav-frame">
+				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<div class="nav-entries">
+					<a class="nav-link entry" href="/spall">Spall</a>
+					<a class="nav-link entry" href="/blog">Blog</a>
+					<button class="nav-link menu" onClick="toggleMenu();">
+						<i class="fa fa-bars" aria-hidden="true"></i>
+					</button>
+				</div>
+			</span>
+		</nav>
+		<div id="dropdown-menu">
+			<a class="dropdown entry" href="/spall">Spall</a>
+			<a class="dropdown entry" href="/blog">Blog</a>
+		</div>
+		<div class="root">
+			<section id="header"><h1>Building The Stupid Way</h1><h5>Thu, 01 Aug 2024</h5><div class="link-row"><a class="older-link" href="footprints_v1.html">Older<i class="fa fa-arrow-right"/></i></a></div></section>
+			<section id="content" class="slug-vertical_biz"><p>So, here&rsquo;s a dirty not-so-secret fact about GravityMoth: We care about deep verticals.
+When we go to write our stack, our top priority is to keep the core of the product in-house and small.</p>
+
+<p>It&rsquo;s not to say we&rsquo;re completely insane. We haven&rsquo;t written our own font renderer. We&rsquo;re still using SDL
+here and there, as a time-saver. We&rsquo;re talking to x11 and Zenity on linux, because file-dialogs
+and window servers aren&rsquo;t really what we&rsquo;re after. We&rsquo;re focusing on build-system simplicity (dev onboarding should stay
+easy), zippy parsing and storage for our data, and as much cross-platform support as we can manage.</p>
+
+<h2>What&rsquo;s our Vertical Slice?</h2>
+
+<p>Ok, time to break things out a little. What&rsquo;s in a Spall?</p>
+
+<h3>Spall&rsquo;s Stack</h3>
+
+<ul>
+<li>Object file parsing (MachO, ELF, and PE32)</li>
+<li>Debug format parsing (PDB and DWARF)</li>
+<li>Trace generation and parsing (manual events, auto-tracing events, and hopefully soon, sampled events)</li>
+<li>Timeline Generation</li>
+<li>UI (Rect, and Line) rendering</li>
+</ul>
+
+<h3>Libraries Used:</h3>
+
+<ul>
+<li>C++ Name Demangling (libc++abi)</li>
+<li>Text Rendering (stb_ttf)</li>
+<li>OS Platform Layer (SDL for Windows and OSX, both of which will get chopped eventually)</li>
+</ul>
+
+<p>What&rsquo;s in a typical profiler?</p>
+
+<h3>Standard Profiler Stack</h3>
+
+<ul>
+<li>Trace generation (on Windows most just wrap ETW, rather than unwind for themselves)</li>
+<li>Timeline Generation</li>
+</ul>
+
+<h3>Libraries Used:</h3>
+
+<ul>
+<li>Object parsing</li>
+<li>Debug parsing</li>
+<li>Trace parsing (often off-the-shelf protobuf or json parsing)</li>
+<li>C++ Name Demangling</li>
+<li>UI rendering</li>
+<li>OS Platform Layer (if they have one at all)</li>
+</ul>
+
+<p>In the short-term, I&rsquo;ve taken on a <em>ton</em> of additional work, and inflated my timetable quite a bit. <strong><em>Ouch.</em></strong></p>
+
+<p>So, what happens if Spall&rsquo;s debug parsing runs a little slow, and we want to multithread it?
+Just gotta reach into the DWARF and PDB parsers, find the natural split-points (compilation units),
+and then toss each into a pool as a task.</p>
+
+<p>What happens if another profiler wanted to do the same?
+Uhhhhhh&hellip;. Well, the symbol resolver on Windows is not thread-safe, and libdwarf is opaque and LGPL-2.
+You could do what perf does, spam addr2line, and hope.
+At least one of the profilers out there started writing their own PDB parser to try to cut loading times down a little,
+and as far as I know, they&rsquo;re still spinning wheels on it.</p>
+
+<p>Traditional company advice is pretty straightforward. Find a niche that needs you, and get to market as fast as possible.
+Get tools in customer hands. Get feedback. Iterate, iterate, iterate, iterate. Provide phenomenal customer service.
+Win people over with founder&rsquo;s advantage.</p>
+
+<p>We&rsquo;re taking the world&rsquo;s stupidest approach, and trying to get all the serious pain out of the way early.
+We know profilers are viable tools. We know customers for good profilers exist. It&rsquo;s a known market.
+We want to ship you a fluffy, contiguous cake without the layers. A solid, single piece wrench.
+It may not have every bell and whistle, but it&rsquo;s not going to snap if you use it as a pry-bar.</p>
+
+<p>This is a scary proposal. What if we die before we get off the ground? What if the VCs don&rsquo;t see us as a unicorn?</p>
+
+<p><em>Oh no.</em></p>
+
+<p>There has to be room in the market for stable, long-term indies who make things well, and don&rsquo;t want to be eaten by Google.
+The end-goal for GravityMoth is to be sustainable, give customers tools they can rely on, and to dogfood our own stuff, so we
+can keep ratcheting up the bar for quality.</p>
+
+<h2>Where We&rsquo;re Going</h2>
+
+<p>We&rsquo;ve been <em>very</em> careful with the roadmap, to help keep the momentum going. Every little step
+is a ratchet towards a launch-ready, solid product. The past few years have had a ton of
+research, missteps, cheers and tears, but the ball is still rolling.</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Nov 2022</td>
+<td>Spall-web is live</td>
+</tr>
+
+<tr>
+<td>Dec 2022</td>
+<td>Histograms for functions</td>
+</tr>
+
+<tr>
+<td>Jan 2023</td>
+<td>Auto-Tracing works for the first time</td>
+</tr>
+
+<tr>
+<td>Mar 2023</td>
+<td>Odin - core:net launched</td>
+</tr>
+
+<tr>
+<td>May 2023</td>
+<td>Spall-Native launched</td>
+</tr>
+
+<tr>
+<td>June 2023</td>
+<td>3 Billion Events at 120 fps</td>
+</tr>
+
+<tr>
+<td>Oct 2023</td>
+<td>Auto-Trace Line Info</td>
+</tr>
+
+<tr>
+<td>Dec 2023</td>
+<td>Auto-Trace Compression</td>
+</tr>
+
+<tr>
+<td>Jun 2024</td>
+<td>Get off SDL_TTF and SDL on Linux</td>
+</tr>
+
+<tr>
+<td>Aug 2024</td>
+<td>Get symbols from DWARF debug info</td>
+</tr>
+
+<tr>
+<td>Aug 2024</td>
+<td>We&rsquo;ve hit 10k lines of code!</td>
+</tr>
+
+<tr>
+<td>End of 2024?</td>
+<td>Spall 1.0 &ndash; Basic sampling on one platform</td>
+</tr>
+</tbody>
+</table>
+<p>Behind the scenes we&rsquo;ve had a lot of life craziness over the past few years, but Spall survived.</p>
+
+<p>We&rsquo;re almost at the 1.0 finish line, and I can&rsquo;t be more excited to share that goal with all of you.</p>
+</section>
+			<section id="sidebar">
+				<ul><a class="slug-entry selected"><li><p>Building The Stupid Way</p></li></a><a class="slug-entry" href="footprints_v1.html"><li><p>Not Fast Enough: LOD Trees</p></li></a><a class="slug-entry" href="tsc_tmi.html"><li><p>Timing on x86: TSC TMI</p></li></a><a class="slug-entry" href="footex.html"><li><p>Futexes and You</p></li></a><a class="slug-entry" href="missinglinux1.html"><li><p>The Missing Linux Manual Pt 1</p></li></a><a class="slug-entry" href="dataviz.html"><li><p>Inspecting Data With Your Eyes</p></li></a><a class="slug-entry" href="dnsdecode.html"><li><p>DNS Domain Name Decoding</p></li></a><a class="slug-entry" href="dwarfsections.html"><li><p>DWARF Section Breakdown</p></li></a><a class="slug-entry" href="firstentry.html"><li><p>Starting a Blog</p></li></a></ul>
+			</section>
+			<section id="nav-footer" class="link-row"><a class="older-link" href="footprints_v1.html">Older<i class="fa fa-arrow-right"/></i></a></section>
+		</div>
+	</body>
+</html>
