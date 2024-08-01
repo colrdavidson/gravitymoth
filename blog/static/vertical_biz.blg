@@ -1,0 +1,100 @@
+title: Building The Stupid Way
+date: 08-01-2024 12:00 PST
+slug: vertical_biz
+desc: Vertical Integration as an Indie
+
+So, here's a dirty not-so-secret fact about GravityMoth: We care about deep verticals.
+When we go to write our stack, our top priority is to keep the core of the product in-house and small.
+
+It's not to say we're completely insane. We haven't written our own font renderer. We're still using SDL
+here and there, as a time-saver. We're talking to x11 and Zenity on linux, because file-dialogs
+and window servers aren't really what we're after. We're focusing on build-system simplicity (dev onboarding should stay
+easy), zippy parsing and storage for our data, and as much cross-platform support as we can manage.
+
+## What's our Vertical Slice?
+
+Ok, time to break things out a little. What's in a Spall?
+
+### Spall's Stack
+
+- Object file parsing (MachO, ELF, and PE32)
+- Debug format parsing (PDB and DWARF)
+- Trace generation and parsing (manual events, auto-tracing events, and hopefully soon, sampled events)
+- Timeline Generation
+- UI (Rect, and Line) rendering
+
+### Libraries Used:
+
+- C++ Name Demangling (libc++abi)
+- Text Rendering (stb_ttf)
+- OS Platform Layer (SDL for Windows and OSX, both of which will get chopped eventually)
+
+What's in a typical profiler?
+
+### Standard Profiler Stack
+
+- Trace generation (on Windows most just wrap ETW, rather than unwind for themselves)
+- Timeline Generation
+
+### Libraries Used:
+
+- Object parsing
+- Debug parsing
+- Trace parsing (often off-the-shelf protobuf or json parsing)
+- C++ Name Demangling
+- UI rendering
+- OS Platform Layer (if they have one at all)
+
+In the short-term, I've taken on a *ton* of additional work, and inflated my timetable quite a bit. ***Ouch.***
+
+So, what happens if Spall's debug parsing runs a little slow, and we want to multithread it?
+Just gotta reach into the DWARF and PDB parsers, find the natural split-points (compilation units),
+and then toss each into a pool as a task.
+
+What happens if another profiler wanted to do the same?
+Uhhhhhh.... Well, the symbol resolver on Windows is not thread-safe, and libdwarf is opaque and LGPL-2.
+You could do what perf does, spam addr2line, and hope.
+At least one of the profilers out there started writing their own PDB parser to try to cut loading times down a little,
+and as far as I know, they're still spinning wheels on it.
+
+Traditional company advice is pretty straightforward. Find a niche that needs you, and get to market as fast as possible.
+Get tools in customer hands. Get feedback. Iterate, iterate, iterate, iterate. Provide phenomenal customer service.
+Win people over with founder's advantage.
+
+We're taking the world's stupidest approach, and trying to get all the serious pain out of the way early.
+We know profilers are viable tools. We know customers for good profilers exist. It's a known market.
+We want to ship you a fluffy, contiguous cake without the layers. A solid, single piece wrench.
+It may not have every bell and whistle, but it's not going to snap if you use it as a pry-bar.
+
+This is a scary proposal. What if we die before we get off the ground? What if the VCs don't see us as a unicorn?
+
+*Oh no.*
+
+There has to be room in the market for stable, long-term indies who make things well, and don't want to be eaten by Google.
+The end-goal for GravityMoth is to be sustainable, give customers tools they can rely on, and to dogfood our own stuff, so we
+can keep ratcheting up the bar for quality.
+
+## Where We're Going
+
+We've been *very* careful with the roadmap, to help keep the momentum going. Every little step
+is a ratchet towards a launch-ready, solid product. The past few years have had a ton of
+research, missteps, cheers and tears, but the ball is still rolling.
+
+|              |                                                                       |
+|--------------|-----------------------------------------------------------------------|
+| Nov 2022     | Spall-web is live                                                     |
+| Dec 2022     | Histograms for functions                                              |
+| Jan 2023     | Auto-Tracing works for the first time                                 |
+| Mar 2023     | Odin - core:net launched                                              |
+| May 2023     | Spall-Native launched                                                 |
+| June 2023    | 3 Billion Events at 120 fps                                           |
+| Oct 2023     | Auto-Trace Line Info                                                  |
+| Dec 2023     | Auto-Trace Compression                                                |
+| Jun 2024     | Get off SDL_TTF and SDL on Linux                                      |
+| Aug 2024     | Get symbols from DWARF debug info                                     |
+| Aug 2024     | We've hit 10k lines of code!                                          |
+| End of 2024? | Spall 1.0 -- Basic sampling on one platform                           |
+
+Behind the scenes we've had a lot of life craziness over the past few years, but Spall survived.
+
+We're almost at the 1.0 finish line, and I can't be more excited to share that goal with all of you.
