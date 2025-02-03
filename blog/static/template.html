@@ -8,25 +8,26 @@
 
 		{{unfurl}}
 
-		<link rel="stylesheet" href="../style.css" />
-		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
+		<base href="../" />
+		<link rel="stylesheet" href="./style.css" />
+		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
 
-		<script src="../index.js"></script>
+		<script src="index.js"></script>
 
 		<title>Gravity Moth</title>
 	</head>
 	<body>
 		<nav>
 			<span class="nav-frame">
-				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<a class="nav-link top"       href="./">Gravity Moth</a>
 				<div class="nav-entries">
-					<a class="nav-link entry" href="/spall">Spall</a>
-					<a class="nav-link entry" href="/blog">Blog</a>
+					<a class="nav-link entry" href="spall">Spall</a>
+					<a class="nav-link entry" href="blog">Blog</a>
 					<button class="nav-link menu" onClick="toggleMenu();">
 						<i class="fa fa-bars" aria-hidden="true"></i>
 					</button>
@@ -34,8 +35,8 @@
 			</span>
 		</nav>
 		<div id="dropdown-menu">
-			<a class="dropdown entry" href="/spall">Spall</a>
-			<a class="dropdown entry" href="/blog">Blog</a>
+			<a class="dropdown entry" href="spall">Spall</a>
+			<a class="dropdown entry" href="blog">Blog</a>
 		</div>
 		<div class="root">
 			<section id="header">{{header}}</section>

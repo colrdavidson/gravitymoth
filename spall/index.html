@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no">
 		<meta name="theme-color" content="#0083B7">
 		<meta name="description" content="Spall Home">
-
+		
 		<meta property="og:type"         content="website" />
 		<meta property="og:site_name"    content="Gravity Moth" />
 		<meta property="og:title"        content="Spall" />
@@ -17,7 +17,8 @@
 		<meta name="twitter:description" content="Fast, Portable Profiling" />
 		<meta name="twitter:image:src"   content="https://gravitymoth.com/media/spall_unfurl.png" />
 
-		<link rel="stylesheet" href="../style.css">
+		<base href="../" />
+		<link rel="stylesheet" href="style.css">
 		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,17 +26,17 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
 
-		<script src="../index.js"></script>
+		<script src="index.js"></script>
 
 		<title>Gravity Moth - Spall</title>
 	</head>
 	<body>
 		<nav>
 			<span class="nav-frame">
-				<a class="nav-link top"       href="/">Gravity Moth</a>
+				<a class="nav-link top"       href="./">Gravity Moth</a>
 				<div class="nav-entries">
-					<a class="nav-link entry" href="/spall">Spall</a>
-					<a class="nav-link entry" href="/blog">Blog</a>
+					<a class="nav-link entry" href="spall">Spall</a>
+					<a class="nav-link entry" href="blog">Blog</a>
 					<button class="nav-link menu" onClick="toggleMenu();">
 						<i class="fa fa-bars" aria-hidden="true"></i>
 					</button>
@@ -43,8 +44,8 @@
 			</span>
 		</nav>
 		<div id="dropdown-menu">
-			<a class="dropdown entry" href="/spall">Spall</a>
-			<a class="dropdown entry" href="/blog">Blog</a>
+			<a class="dropdown entry" href="spall">Spall</a>
+			<a class="dropdown entry" href="blog">Blog</a>
 		</div>
 		<div class="root centered">
 			<section id="header">
@@ -52,13 +53,13 @@
 					<h1>Spall</h1>
 				</div>
 				<h2>Spall is a fast, easy-to-use profiler, on the web, and natively on your computer</h2>
-				<img src="../media/odin-landscape.png" alt="Spall Landscape">
+				<img src="media/odin-landscape.png" alt="Spall Landscape">
 			</section>
 			<section id="content" class="spall-landing">
 				<div class="direction">
 					<h2>Want to try it?</h2>
-					<a href="/spall/spall-web.html" class="web-button">
-						<img src="../media/fib-funcs.png" alt="Spall Mini-Logo">
+					<a href="spall/spall-web.html" class="web-button">
+						<img src="media/fib-funcs.png" alt="Spall Mini-Logo">
 						<p>Check out <span>Spall Web</span></p>
 					</a>
 				</div>
