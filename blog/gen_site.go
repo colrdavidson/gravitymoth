@@ -2,26 +2,27 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
+	"io/ioutil"
 	"log"
 	"os"
-	"time"
-	"strings"
 	"sort"
-	"io/ioutil"
-	"io/fs"
+	"strings"
+	"time"
+
 	"github.com/gomarkdown/markdown"
 )
 
 type BlogEntry struct {
-	Name string
-	Path string
+	Name    string
+	Path    string
 	Content []byte
 
-	Title string
-	Date time.Time
-	Slug string
+	Title       string
+	Date        time.Time
+	Slug        string
 	Description string
-	Thumbnail string
+	Thumbnail   string
 }
 
 const static_dir = "static/"
@@ -62,7 +63,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 	chunks := make([]string, 0)
 
 	// these have to be in descending occuring order
-	tags := []string{"{{description}}", "{{unfurl}}", "{{header}}", "{{slug}}", "{{content}}", "{{slugs}}", "{{nav-foot}}"}
+	tags := []string{"{{description}}", "{{unfurl}}", "{{header}}", "{{nav-head}}", "{{slug}}", "{{content}}", "{{slugs}}", "{{nav-foot}}"}
 
 	cur_chunk := html_template
 	for i, tag := range tags {
@@ -88,6 +89,8 @@ func generate_posts(entries []BlogEntry, html_template string) {
 	}
 
 	for i, entry := range entries {
+		chunkId := 0
+
 		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
 		if i == 0 {
 			slug_link := fmt.Sprintf("%s", entry.Slug)
@@ -101,15 +104,19 @@ func generate_posts(entries []BlogEntry, html_template string) {
 		}
 		defer f.Close()
 
-		f.WriteString(chunks[0])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{description}}
 		// Generate description
 		{
 			f.WriteString(entry.Description)
 		}
 
-		f.WriteString(chunks[1])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{unfurl}}
 		// Generate unfurl
 		{
 			f.WriteString(`<meta property="og:type"  content="article" />`)
@@ -133,25 +140,34 @@ func generate_posts(entries []BlogEntry, html_template string) {
 			f.WriteString(`<meta property="twitter:card" content="summary">`)
 		}
 
-		f.WriteString(chunks[2])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{header}}
 		date_str := entry.Date.Format(out_time_fmt)
 		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
 		f.WriteString(hdr_str)
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
-		f.WriteString(`<div class="link-row">`)
+		// {{nav-head}}
 		generate_link_row(entries, i, f)
-		f.WriteString(`</div>`)
-		f.WriteString(chunks[3])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{slug}}
 		slug_class := fmt.Sprintf("slug-%s", entry.Slug)
 		f.WriteString(slug_class)
-		f.WriteString(chunks[4])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{content}}
 		html := markdown.ToHTML(entry.Content, nil, nil)
 		f.WriteString(string(html))
-		f.WriteString(chunks[5])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{slugs}}
 		for j, s := range slugs {
 			if j == i {
 				li_str := fmt.Sprintf(`<a class="slug-entry selected"><li><p>%s</p></li></a>`, entry.Title)
@@ -161,11 +177,13 @@ func generate_posts(entries []BlogEntry, html_template string) {
 				f.WriteString(s)
 			}
 		}
-		f.WriteString(chunks[6])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 
+		// {{nav-foot}}
 		generate_link_row(entries, i, f)
-
-		f.WriteString(chunks[7])
+		f.WriteString(chunks[chunkId])
+		chunkId++
 	}
 }
 
@@ -186,7 +204,7 @@ func generate_rss(entries []BlogEntry, rss_template string) {
 	f.WriteString(chunks[0])
 
 	for i, entry := range entries {
-		date_str := entry.Date.Format(rss_time_fmt)	
+		date_str := entry.Date.Format(rss_time_fmt)
 		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
 		post_str := fmt.Sprintf(`<item><title>%s</title><link>%s</link><description>%s</description><pubDate>%s</pubDate><guid isPermaLink="true">%s</guid></item>`, entry.Title, post_link, entry.Description, date_str, post_link)
 
@@ -262,8 +280,7 @@ func main() {
 				img = "logo_bg.png"
 			}
 
-			md := BlogEntry{Name: file.Name(), Path: static_dir, Content:
-content, Title: string(title), Date: date, Slug: string(slug), Description: string(desc), Thumbnail: string(img)}
+			md := BlogEntry{Name: file.Name(), Path: static_dir, Content: content, Title: string(title), Date: date, Slug: string(slug), Description: string(desc), Thumbnail: string(img)}
 			mds = append(mds, md)
 		} else if file.Name() == "template.html" {
 			html_template_file = file
@@ -299,7 +316,7 @@ content, Title: string(title), Date: date, Slug: string(slug), Description: stri
 	})
 
 	generate_posts(mds, string(html_template))
-	generate_rss(mds,   string(rss_template))
+	generate_rss(mds, string(rss_template))
 
 	fmt.Printf("site generated\n")
 }
