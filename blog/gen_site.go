@@ -31,7 +31,7 @@ const out_time_fmt = "Mon, 02 Jan 2006"
 const rss_time_fmt = "Mon, 02 Jan 2006 15:04:05 -0700"
 
 func generate_slug(e BlogEntry) string {
-	return "blog/" + fmt.Sprintf("%s.html", e.Slug)
+	return "blog/" + fmt.Sprintf("%s", e.Slug)
 }
 
 func generate_redirect(bin_name string, to string) {
@@ -90,7 +90,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 	for i, entry := range entries {
 		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
 		if i == 0 {
-			slug_link := fmt.Sprintf("%s.html", entry.Slug)
+			slug_link := fmt.Sprintf("%s", entry.Slug)
 			headname := fmt.Sprintf("%sindex.html", bin_dir)
 			generate_redirect(headname, slug_link)
 		}

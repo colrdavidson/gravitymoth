@@ -7,6 +7,7 @@
 		<meta name="theme-color" content="#0083B7">
 		<meta name="description" content="Gravity Moth Home">
 
+		<base href="/" />
 		<link rel="stylesheet" href="style.css">
 		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,28 +28,30 @@
 		<title>Gravity Moth</title>
 	</head>
 	<body>
-		<nav>
-			<span class="nav-frame">
-				<a class="nav-link top" href="./">Gravity Moth</a>
-				<div class="nav-entries">
-					<a class="nav-link entry" href="spall">Spall</a>
-					<a class="nav-link entry" href="blog">Blog</a>
-					<button class="nav-link menu" onClick="toggleMenu();">
-						<i class="fa fa-bars" aria-hidden="true"></i>
-					</button>
-				</div>
-			</span>
-		</nav>
-		<div id="dropdown-menu">
-			<a class="dropdown entry" href="spall">Spall</a>
-			<a class="dropdown entry" href="blog">Blog</a>
-		</div>
-		<div class="banner">
-			<section id="banner-header">
-				<img src="media/logo.svg" alt="Gravity Moth Logo" />
-				<h1 class="announce">Gravity Moth</h1>
-			</section>
-		</div>
+		<header>
+			<nav>
+				<span class="nav-frame">
+					<a class="nav-link top" href="./">Gravity Moth</a>
+					<div class="nav-entries">
+						<a class="nav-link entry" href="spall">Spall</a>
+						<a class="nav-link entry" href="blog">Blog</a>
+						<button class="nav-link menu" onClick="toggleMenu();">
+							<i class="fa fa-bars" aria-hidden="true"></i>
+						</button>
+					</div>
+				</span>
+			</nav>
+			<div id="dropdown-menu">
+				<a class="dropdown entry" href="spall">Spall</a>
+				<a class="dropdown entry" href="blog">Blog</a>
+			</div>
+			<div class="banner">
+				<section id="banner-header">
+					<img src="media/logo.svg" alt="Gravity Moth Logo" />
+					<h1 class="announce">Gravity Moth</h1>
+				</section>
+			</div>
+		</header>
 		<div class="root main">
 			<section id="content">
 				<h2>Developer Tools</h2>
@@ -58,7 +61,7 @@
 							<img src="media/odin-landscape.png" alt="Spall Landscape">
 							<p>Spall is a profiler and code exploration tool, designed to help you sift through billions of events</p>
 							<div class="button-row">
-								<a href="spall/spall-web.html">
+								<a href="spall/spall-web">
 									<button>Explore Code on the Web!</button>
 								</a>
 								<a href="spall">

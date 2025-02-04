@@ -65,6 +65,10 @@ body {
 	color: var(--font-color);
 }
 
+header {
+	width: 100%;
+}
+
 nav {
 	display: flex;
 	flex-direction: row;
