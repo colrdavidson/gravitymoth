@@ -2,13 +2,16 @@ Options -Indexes
 
 RewriteEngine On
 
+# /blog maps to /public/blog within the filesystem
+RewriteRule ^blog(.*)$ /public/blog$1 [L,NC]
+
 # Redirect **/file.html -> **/file
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^?\s]+)\.html [NC]
 RewriteRule ^(.*)\.html$ /$1 [R=301,L]
 
 # Enable **/file to map to **/file.html
 RewriteCond %{REQUEST_FILENAME}.html -f
-RewriteRule ^([^./]+)$ $1.html [L]
+RewriteRule ^(.*)$ $1.html [L]
 
 # 403 & 404 pages
 ErrorDocument 403 /404.html
