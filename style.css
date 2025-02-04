@@ -15,6 +15,9 @@
 
 	--logo-bg:              #002B36;
 	--shadow-color:         rgba(0, 0, 0, 0.1);
+	
+	--layout-padding: 1rem;
+	--layout-max-width: 60rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,14 +58,47 @@ section:not(#demo):not(#sidebar) {
 
 html {
 	scrollbar-gutter: stable;
+	height: 100%;
 }
 
 body {
+	min-height: 100%;
 	padding: 0;
 	margin: 0;
 	font-family: 'Fira Sans', sans-serif;
 	background-color: var(--bg-color);
 	color: var(--font-color);
+}
+
+@layer layout {
+	.layout-three-column {
+		--padding: var(--layout-padding);
+		--max-width: var(--layout-max-width);
+		
+		display: grid;
+		grid-template-columns:
+			[full-start] minmax(1rem, 1fr)
+			[padding-start] var(--padding)
+			[main-start] minmax(0, calc(var(--max-width) - 2 * var(--padding))) [main-end]
+			var(--padding) [padding-end]
+			minmax(1rem, 1fr) [full-end];
+		grid-template-rows: auto 1fr auto;
+		gap: 1rem 0;
+		> * {
+			display: grid;
+			/* fallback for browsers w/o subgrid support */
+			grid-template-columns: var(--padding) [main-start] auto [main-end] var(--padding);
+			grid-template-columns: subgrid;
+			grid-column: padding;
+			> * {
+				grid-column: main;
+			}
+		}
+	}
+}
+
+header, footer {
+	grid-column: full;
 }
 
 header {
@@ -230,6 +266,7 @@ nav > a {
 	grid-template-rows: auto 1fr auto;
 }
 .banner {
+	grid-column: full;
 	background-color: var(--logo-bg);
 }
 
@@ -937,4 +974,23 @@ td {
 
 .web-button {
 	text-decoration: none;
+}
+
+footer div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	width: 100%;
+	height: 4em;
+
+	background-color: var(--nav-color);
+}
+
+header {
+	background-color: var(--nav-color);
+}
+
+footer {
+	background-color: var(--nav-color);
 }
