@@ -30,6 +30,10 @@ const in_time_fmt = "01-02-2006 15:04 MST"
 const out_time_fmt = "Mon, 02 Jan 2006"
 const rss_time_fmt = "Mon, 02 Jan 2006 15:04:05 -0700"
 
+func generate_slug(e BlogEntry) string {
+	return "blog/" + fmt.Sprintf("%s.html", e.Slug)
+}
+
 func generate_redirect(bin_name string, to string) {
 	f, err := os.Create(bin_name)
 	if err != nil {
@@ -37,19 +41,19 @@ func generate_redirect(bin_name string, to string) {
 	}
 	defer f.Close()
 
-	redirect_str := fmt.Sprintf("<meta http-equiv=\"refresh\" content=\"0; URL=%s\" />", to)
+	redirect_str := fmt.Sprintf("<meta name=\"color-scheme\" content=\"light dark\"><meta http-equiv=\"refresh\" content=\"0; URL=%s\" />", to)
 	f.WriteString(redirect_str)
 }
 
 func generate_link_row(entries []BlogEntry, idx int, f *os.File) {
 	if idx > 0 {
 		prev_entry := entries[idx-1]
-		prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s.html\"><i class=\"fa fa-arrow-left\"></i>Newer</a>", prev_entry.Slug)
+		prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s\"><i class=\"fa fa-arrow-left\"></i>Newer</a>", generate_slug(prev_entry))
 		f.WriteString(prev_str)
 	}
 	if idx < len(entries)-1 {
 		next_entry := entries[idx+1]
-		next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s.html\">Older<i class=\"fa fa-arrow-right\"/></i></a>", next_entry.Slug)
+		next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s\">Older<i class=\"fa fa-arrow-right\"/></i></a>", generate_slug(next_entry))
 		f.WriteString(next_str)
 	}
 }
@@ -78,7 +82,7 @@ func generate_posts(entries []BlogEntry, html_template string) {
 
 	slugs := make([]string, 0)
 	for _, md := range entries {
-		slug_link := fmt.Sprintf("%s.html", md.Slug)
+		slug_link := generate_slug(md)
 		li_str := fmt.Sprintf(`<a class="slug-entry" href="%s"><li><p>%s</p></li></a>`, slug_link, md.Title)
 		slugs = append(slugs, li_str)
 	}
