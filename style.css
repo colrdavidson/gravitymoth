@@ -80,20 +80,7 @@ nav {
 	background-color: var(--nav-color);
 }
 
-.nav-frame {
-	max-width: 60em;
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin-left: auto;
-	margin-right: auto;
-	padding-left: 1em;
-	padding-right: 1em;
-}
-
-.nav-frame > a {
+nav > a {
 	color: var(--nav-font-color);
 	text-decoration: none;
 }
@@ -244,7 +231,6 @@ nav {
 }
 .banner {
 	background-color: var(--logo-bg);
-	margin-bottom: 1em;
 }
 
 .root.centered > #header {
@@ -524,9 +510,9 @@ h2 {
 		height: 3em;
 		margin-bottom: 0;
 	}
-	.nav-frame {
+	nav {
 		font-size: 1.125em;
-		padding-left: 0.5em;
+		/* padding-left: 0.5em; */
 	}
 	.nav-link.entry {
 		display: none;
