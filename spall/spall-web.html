@@ -18,27 +18,40 @@
 		<meta name="twitter:description" content="Fast, Portable Profiling" />
 		<meta name="twitter:image:src"   content="https://gravitymoth.com/media/spall_unfurl.png" />
 
-		<base href="../" />
-		<link rel="stylesheet" href="style.css">
-		<link rel="shortcut icon" type="image/png" href="media/favicon.png">
+		<link rel="stylesheet" href="../style.css">
+		<link rel="shortcut icon" type="image/png" href="../media/favicon.png">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="alternate" type="application/rss+xml" title="RSS Feed for GravityMoth Blog" href="https://gravitymoth.com/blog/feed.xml" />
 
-		<script src="index.js"></script>
+		<script src="../index.js"></script>
 
 		<title>Gravity Moth - Spall Web</title>
 	</head>
 	<script>
 		function load_spall() {
-			let spall_frame = "<iframe class=\"spall-frame\" src=\"spall/spall\" id=\"spall\" allowfullscreen></iframe>";
-			document.getElementById("demo").innerHTML = spall_frame;
-			document.getElementById("fullscreen-button").classList.remove("invisible");
+			const demoElem = document.getElementById("demo");
+			demoElem.classList.add('expanded');
+			
+			setTimeout(() => {
+				const iframe = document.createElement('iframe');
+				iframe.setAttribute('class', 'spall-frame');
+				iframe.src = 'spall';
+				iframe.id = 'spall';
+				iframe.allowFullscreen = true;
+				iframe.setAttribute('style', 'opacity: 0; transition: 0.15s opacity');
+				iframe.onload = () => {
+					demoElem.classList.add('loaded');
+					iframe.setAttribute('style', 'opacity: 1; transition: 0.15s opacity');
+				}
+				demoElem.replaceChildren(iframe);
+				document.getElementById("fullscreen-button").classList.remove("invisible");
+			}, 200);
 		}
 		function load_manual() {
-			window.open("spall/spall", '_blank');
+			window.open("spall", '_blank');
 		}
 
 		function set_fullscreen() {
@@ -48,18 +61,18 @@
 	<body class="layout-three-column">
 		<header>
 			<nav>
-				<a class="nav-link top" href="./">Gravity Moth</a>
+				<a class="nav-link top" href="../">Gravity Moth</a>
 				<div class="nav-entries">
-					<a class="nav-link entry" href="spall">Spall</a>
-					<a class="nav-link entry" href="blog">Blog</a>
+					<a class="nav-link entry" href="../spall">Spall</a>
+					<a class="nav-link entry" href="../blog">Blog</a>
 					<button class="nav-link menu" onClick="toggleMenu();">
 						<i class="fa fa-bars" aria-hidden="true"></i>
 					</button>
 				</div>
 			</nav>
 			<div id="dropdown-menu">
-				<a class="dropdown entry" href="spall">Spall</a>
-				<a class="dropdown entry" href="blog">Blog</a>
+				<a class="dropdown entry" href="../spall">Spall</a>
+				<a class="dropdown entry" href="../blog">Blog</a>
 			</div>
 		</header>
 		<div class="root spall">
@@ -72,14 +85,16 @@
 				<h5>Spall-web is a code profiler that runs in your browser</h5>
 			</section>
 			<section id="demo" class="spall-frame-box">
-				<div class="button-box">
-					<button onclick="load_spall()">Start Spall</button>
-					<button class="manual" onclick="load_manual()" title="Open Spall in a New Tab"><i class="fa fa-external-link"></i></button>
-				</div>
-				<div class="warning">
-					<h4>Heads up!</h4>
-					<p>spall isn't mobile-friendly due to the serious memory and screen constraints most 
-					mobile devices have. If you're not on a desktop, you should use one for this instead!</p>
+				<div class="container">
+					<div class="button-box">
+						<button onclick="load_spall()">Start Spall</button>
+						<button class="manual" onclick="load_manual()" title="Open Spall in a New Tab"><i class="fa fa-external-link"></i></button>
+					</div>
+					<div class="warning">
+						<h4>Heads up!</h4>
+						<p>spall isn't mobile-friendly due to the serious memory and screen constraints most 
+						mobile devices have. If you're not on a desktop, you should use one for this instead!</p>
+					</div>
 				</div>
 			</section>
 			<section id="sidebar">
