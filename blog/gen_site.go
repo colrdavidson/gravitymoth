@@ -27,15 +27,19 @@ type BlogEntry struct {
 	Thumbnail   string
 }
 
+type BlogEntryView struct {
+	Title string
+	Slug  string
+}
+
 type PostTemplateData struct {
-	Description string
-	Unfurl      htmlTemplate.HTML
-	Header      htmlTemplate.HTML
-	NavHead     htmlTemplate.HTML
-	Slug        string
+	PrevEntryId int
+	EntryId     int
+	NextEntryId int
+	Entry       BlogEntry
+	Entries     []BlogEntry
+	Date        string
 	Content     htmlTemplate.HTML
-	Slugs       htmlTemplate.HTML
-	NavFoot     htmlTemplate.HTML
 }
 
 type RSSEntry struct {
@@ -67,89 +71,40 @@ func generate_redirect(bin_name string, to string) {
 	f.WriteString(redirect_str)
 }
 
-func generate_link_row(entries []BlogEntry, idx int) htmlTemplate.HTML {
-	linkRowStr := ""
-	if idx > 0 {
-		prev_entry := entries[idx-1]
-		prev_str := fmt.Sprintf("<a class=\"newer-link\" href=\"%s\"><i class=\"fa fa-arrow-left\"></i>Newer</a>", generate_slug(prev_entry))
-		linkRowStr += prev_str
-	}
-	if idx < len(entries)-1 {
-		next_entry := entries[idx+1]
-		next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s\">Older<i class=\"fa fa-arrow-right\"/></i></a>", generate_slug(next_entry))
-		linkRowStr += next_str
-	}
-	return htmlTemplate.HTML(linkRowStr)
-}
-
-func generate_unfurl(entry BlogEntry) htmlTemplate.HTML {
-	unfurl := fmt.Sprintf(`<meta property="og:type"  content="article" />
-		<meta property="og:url" content="https://gravitymoth.com/blog/%s" />
-		<meta property="og:description" content="%s" />
-		<meta property="og:title" content="%s" />
-		<meta property="twitter:title" content="%s" />
-		<meta property="og:image" content="https://gravitymoth.com/media/%s" />
-		<meta property="og:locale" content="en_US">
-		<meta property="og:site_name" content="Gravity Moth">
-		<meta property="twitter:card" content="summary">`,
-		entry.Slug,
-		entry.Description,
-		entry.Title,
-		entry.Title,
-		entry.Thumbnail,
-	)
-
-	return htmlTemplate.HTML(unfurl)
-}
-
 func generate_posts(entries []BlogEntry, html_templpath string) {
-	tmpl, err := htmlTemplate.ParseFiles(html_templpath)
+	funcMap := textTemplate.FuncMap{
+		"generateSlug": generate_slug,
+	}
+
+	tmpl, err := htmlTemplate.New("template.html").Funcs(funcMap).ParseFiles(html_templpath)
 	if err != nil {
 		panic(err)
 	}
 
-	slugs := make([]string, 0)
-	for _, md := range entries {
-		slug_link := generate_slug(md)
-		li_str := fmt.Sprintf(`<a class="slug-entry" href="%s"><li><p>%s</p></li></a>`, slug_link, md.Title)
-		slugs = append(slugs, li_str)
-	}
-
 	for i, entry := range entries {
-		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
+		// generate redirect page
 		if i == 0 {
 			slug_link := fmt.Sprintf("%s", entry.Slug)
 			headname := fmt.Sprintf("%sindex.html", bin_dir)
 			generate_redirect(headname, slug_link)
 		}
 
+		// generate blog post page using template
+		bin_name := fmt.Sprintf("%s%s.html", bin_dir, entry.Slug)
 		f, err := os.Create(bin_name)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer f.Close()
 
-		date_str := entry.Date.Format(out_time_fmt)
-		hdr_str := fmt.Sprintf("<h1>%s</h1><h5>%s</h5>", entry.Title, date_str)
-
-		slugs_str := ""
-		for j, s := range slugs {
-			if j == i {
-				slugs_str += fmt.Sprintf(`<a class="slug-entry selected"><li><p>%s</p></li></a>`, entry.Title)
-			} else {
-				slugs_str += s
-			}
-		}
-
 		data := PostTemplateData{
-			Description: entry.Description,
-			Unfurl:      generate_unfurl(entry),
-			Header:      htmlTemplate.HTML(hdr_str),
-			NavHead:     generate_link_row(entries, i),
-			Slug:        fmt.Sprintf("slug-%s", entry.Slug),
+			PrevEntryId: i - 1,
+			EntryId:     i,
+			NextEntryId: i + 1,
+			Entry:       entry,
+			Entries:     entries,
+			Date:        entry.Date.Format(out_time_fmt),
 			Content:     htmlTemplate.HTML(markdown.ToHTML(entry.Content, nil, nil)),
-			Slugs:       htmlTemplate.HTML(slugs_str),
-			NavFoot:     generate_link_row(entries, i),
 		}
 
 		err = tmpl.Execute(f, data)
@@ -190,7 +145,6 @@ func generate_rss(entries []BlogEntry, rss_templpath string) {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func main() {

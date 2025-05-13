@@ -5,9 +5,17 @@
 		<meta name="color-scheme" content="light dark">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no">
 		<meta name="theme-color" content="#0083B7">
-		<meta name="description" content="{{.Description}}">
+		<meta name="description" content="{{.Entry.Description}}">
 
-		{{.Unfurl}}
+		<meta property="og:type"  content="article" />
+		<meta property="og:url" content="https://gravitymoth.com/blog/{{.Entry.Slug}}" />
+		<meta property="og:description" content="{{.Entry.Description}}" />
+		<meta property="og:title" content="{{.Entry.Title}}" />
+		<meta property="twitter:title" content="{{.Entry.Title}}" />
+		<meta property="og:image" content="https://gravitymoth.com/media/{{.Entry.Title}}" />
+		<meta property="og:locale" content="en_US">
+		<meta property="og:site_name" content="Gravity Moth">
+		<meta property="twitter:card" content="summary">
 
 		<base href="../" />
 		<link rel="stylesheet" href="./style.css" />
@@ -40,13 +48,22 @@
 			</div>
 		</header>
 		<div class="root blog">
-			<section id="header">{{.Header}}</section>
-			<section id="nav-header" class="link-row">{{.NavHead}}</section>
-			<section id="content" class="{{.Slug}}">{{.Content}}</section>
-			<section id="sidebar">
-				<ul>{{.Slugs}}</ul>
+			<section id="header">
+				<h1>{{.Entry.Title}}</h1><h5>{{.Date}}</h5>
 			</section>
-			<section id="nav-footer" class="link-row">{{.NavFoot}}</section>
+			<section id="nav-header" class="link-row">{{if gt .PrevEntryId -1 }}
+				<a class="newer-link" href="%s"><i class="fa fa-arrow-left"></i>Newer</a>{{end}}{{if lt .NextEntryId (len .Entries) }}
+				<a class="older-link" href="%s">Older<i class="fa fa-arrow-right"/></i></a>{{end}}
+			</section>
+			<section id="content" class="slug-{{.Entry.Slug}}">{{.Content}}</section>
+			<section id="sidebar">
+				<ul>{{range $entry := .Entries}}
+					<a class="slug-entry" href="{{generateSlug $entry}}"><li><p>{{$entry.Title}}</p></li></a>{{end}}</ul>
+			</section>
+			<section id="nav-footer" class="link-row">{{if gt .PrevEntryId -1 }}
+				<a class="newer-link" href="%s"><i class="fa fa-arrow-left"></i>Newer</a>{{end}}{{if lt .NextEntryId (len .Entries) }}
+				<a class="older-link" href="%s">Older<i class="fa fa-arrow-right"/></i></a>{{end}}
+			</section>
 		</div>
 		<footer>
 			<div>&copy; 2025 Gravity Moth</div>
