@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"html/template"
+	htmlTemplate "html/template"
 	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"sort"
 	"strings"
+	textTemplate "text/template"
 	"time"
 
 	"github.com/gomarkdown/markdown"
@@ -28,13 +29,21 @@ type BlogEntry struct {
 
 type PostTemplateData struct {
 	Description string
-	Unfurl      template.HTML
-	Header      template.HTML
-	NavHead     template.HTML
+	Unfurl      htmlTemplate.HTML
+	Header      htmlTemplate.HTML
+	NavHead     htmlTemplate.HTML
 	Slug        string
-	Content     template.HTML
-	Slugs       template.HTML
-	NavFoot     template.HTML
+	Content     htmlTemplate.HTML
+	Slugs       htmlTemplate.HTML
+	NavFoot     htmlTemplate.HTML
+}
+
+type RSSEntry struct {
+	Title       string
+	Link        string
+	Description string
+	PubDate     string
+	Guid        string
 }
 
 const static_dir = "static/"
@@ -58,7 +67,7 @@ func generate_redirect(bin_name string, to string) {
 	f.WriteString(redirect_str)
 }
 
-func generate_link_row(entries []BlogEntry, idx int) template.HTML {
+func generate_link_row(entries []BlogEntry, idx int) htmlTemplate.HTML {
 	linkRowStr := ""
 	if idx > 0 {
 		prev_entry := entries[idx-1]
@@ -70,10 +79,10 @@ func generate_link_row(entries []BlogEntry, idx int) template.HTML {
 		next_str := fmt.Sprintf("<a class=\"older-link\" href=\"%s\">Older<i class=\"fa fa-arrow-right\"/></i></a>", generate_slug(next_entry))
 		linkRowStr += next_str
 	}
-	return template.HTML(linkRowStr)
+	return htmlTemplate.HTML(linkRowStr)
 }
 
-func generate_unfurl(entry BlogEntry) template.HTML {
+func generate_unfurl(entry BlogEntry) htmlTemplate.HTML {
 	unfurl := fmt.Sprintf(`<meta property="og:type"  content="article" />
 		<meta property="og:url" content="https://gravitymoth.com/blog/%s" />
 		<meta property="og:description" content="%s" />
@@ -90,11 +99,11 @@ func generate_unfurl(entry BlogEntry) template.HTML {
 		entry.Thumbnail,
 	)
 
-	return template.HTML(unfurl)
+	return htmlTemplate.HTML(unfurl)
 }
 
 func generate_posts(entries []BlogEntry, html_templpath string) {
-	tmpl, err := template.ParseFiles(html_templpath)
+	tmpl, err := htmlTemplate.ParseFiles(html_templpath)
 	if err != nil {
 		panic(err)
 	}
@@ -135,11 +144,11 @@ func generate_posts(entries []BlogEntry, html_templpath string) {
 		data := PostTemplateData{
 			Description: entry.Description,
 			Unfurl:      generate_unfurl(entry),
-			Header:      template.HTML(hdr_str),
+			Header:      htmlTemplate.HTML(hdr_str),
 			NavHead:     generate_link_row(entries, i),
 			Slug:        fmt.Sprintf("slug-%s", entry.Slug),
-			Content:     template.HTML(markdown.ToHTML(entry.Content, nil, nil)),
-			Slugs:       template.HTML(slugs_str),
+			Content:     htmlTemplate.HTML(markdown.ToHTML(entry.Content, nil, nil)),
+			Slugs:       htmlTemplate.HTML(slugs_str),
 			NavFoot:     generate_link_row(entries, i),
 		}
 
@@ -151,22 +160,24 @@ func generate_posts(entries []BlogEntry, html_templpath string) {
 }
 
 func generate_rss(entries []BlogEntry, rss_templpath string) {
-	tmpl, err := template.ParseFiles(rss_templpath)
+	tmpl, err := textTemplate.ParseFiles(rss_templpath)
 	if err != nil {
 		panic(err)
 	}
 
-	entriesStr := ""
-	for i, entry := range entries {
+	rssEntries := []RSSEntry{}
+
+	for _, entry := range entries {
 		date_str := entry.Date.Format(rss_time_fmt)
 		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
-		post_str := fmt.Sprintf(`<item><title>%s</title><link>%s</link><description>%s</description><pubDate>%s</pubDate><guid isPermaLink="true">%s</guid></item>`, entry.Title, post_link, entry.Description, date_str, post_link)
-
-		if i != 0 {
-			entriesStr += "\n\t"
+		rssEntry := RSSEntry{
+			Title:       entry.Title,
+			Description: entry.Description,
+			PubDate:     date_str,
+			Link:        post_link,
+			Guid:        post_link,
 		}
-
-		entriesStr += post_str
+		rssEntries = append(rssEntries, rssEntry)
 	}
 
 	bin_name := fmt.Sprintf("%sfeed.xml", bin_dir)
@@ -175,7 +186,7 @@ func generate_rss(entries []BlogEntry, rss_templpath string) {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	err = tmpl.Execute(f, template.HTML(entriesStr))
+	err = tmpl.Execute(f, rssEntries)
 	if err != nil {
 		panic(err)
 	}

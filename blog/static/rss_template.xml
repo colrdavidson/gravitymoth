@@ -3,7 +3,13 @@
 <channel>
 	<title>Gravity Moth Blog</title>
 	<link>https://gravitymoth.com/blog</link>
-	<description>Tool and Tech Deep Dives</description>
-	{{.}}
+	<description>Tool and Tech Deep Dives</description>{{range $entry := .}}
+	<item>
+		<title>{{$entry.Title}}</title>
+		<link>{{$entry.Link}}</link>
+		<description>{{$entry.Description}}</description>
+		<pubDate>{{$entry.PubDate}}</pubDate>
+		<guid isPermaLink="true">{{$entry.Guid}}</guid></item>
+	</item>{{end}}
 </channel>
 </rss>
