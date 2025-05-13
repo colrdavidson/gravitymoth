@@ -96,7 +96,6 @@ func generate_unfurl(entry BlogEntry) template.HTML {
 func generate_posts(entries []BlogEntry, html_templpath string) {
 	tmpl, err := template.ParseFiles(html_templpath)
 	if err != nil {
-		fmt.Printf("One\n")
 		panic(err)
 	}
 
@@ -146,18 +145,29 @@ func generate_posts(entries []BlogEntry, html_templpath string) {
 
 		err = tmpl.Execute(f, data)
 		if err != nil {
-			fmt.Printf("Two\n")
 			panic(err)
 		}
 	}
 }
 
-func generate_rss(entries []BlogEntry, rss_template string) {
-	file_chunks := strings.Split(rss_template, "{{entries}}")
-	if len(file_chunks) != 2 {
-		log.Fatal("Template had no {{entries}} tag!\n")
+func generate_rss(entries []BlogEntry, rss_templpath string) {
+	tmpl, err := template.ParseFiles(rss_templpath)
+	if err != nil {
+		panic(err)
 	}
-	chunks := []string{file_chunks[0], file_chunks[1]}
+
+	entriesStr := ""
+	for i, entry := range entries {
+		date_str := entry.Date.Format(rss_time_fmt)
+		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
+		post_str := fmt.Sprintf(`<item><title>%s</title><link>%s</link><description>%s</description><pubDate>%s</pubDate><guid isPermaLink="true">%s</guid></item>`, entry.Title, post_link, entry.Description, date_str, post_link)
+
+		if i != 0 {
+			entriesStr += "\n\t"
+		}
+
+		entriesStr += post_str
+	}
 
 	bin_name := fmt.Sprintf("%sfeed.xml", bin_dir)
 	f, err := os.Create(bin_name)
@@ -165,22 +175,11 @@ func generate_rss(entries []BlogEntry, rss_template string) {
 		log.Fatal(err)
 	}
 	defer f.Close()
-
-	f.WriteString(chunks[0])
-
-	for i, entry := range entries {
-		date_str := entry.Date.Format(rss_time_fmt)
-		post_link := fmt.Sprintf("https://gravitymoth.com/blog/%s", entry.Slug)
-		post_str := fmt.Sprintf(`<item><title>%s</title><link>%s</link><description>%s</description><pubDate>%s</pubDate><guid isPermaLink="true">%s</guid></item>`, entry.Title, post_link, entry.Description, date_str, post_link)
-
-		if i != 0 {
-			f.WriteString("\n\t")
-		}
-
-		f.WriteString(post_str)
+	err = tmpl.Execute(f, template.HTML(entriesStr))
+	if err != nil {
+		panic(err)
 	}
 
-	f.WriteString(chunks[1])
 }
 
 func main() {
@@ -265,19 +264,14 @@ func main() {
 	_ = os.Mkdir(bin_dir, os.ModePerm)
 
 	html_templpath := fmt.Sprintf("%s%s", static_dir, html_template_file.Name())
-
 	rss_templpath := fmt.Sprintf("%s%s", static_dir, rss_template_file.Name())
-	rss_template, err := os.ReadFile(rss_templpath)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	sort.SliceStable(mds, func(i, j int) bool {
 		return mds[i].Date.After(mds[j].Date)
 	})
 
 	generate_posts(mds, html_templpath)
-	generate_rss(mds, string(rss_template))
+	generate_rss(mds, rss_templpath)
 
 	fmt.Printf("site generated\n")
 }
